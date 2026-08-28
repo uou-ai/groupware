@@ -1,0 +1,1265 @@
+<title>UWIN 지원센터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --surface-2: #edf1f7;
+    --surface-3: #e4e9f1;
+    --border: #dde3ec;
+    --text: #19212f;
+    --text-muted: #5b6478;
+    --text-faint: #8790a1;
+    --accent: #1e4b8f;
+    --accent-strong: #12345f;
+    --accent-soft: #e7eefb;
+    --accent-soft-border: #cddcf3;
+    --success: #227a53;
+    --success-soft: #e4f4ec;
+    --pending: #ad6a12;
+    --pending-soft: #fbeedb;
+    --open: #7a3fb0;
+    --open-soft: #f1e8fa;
+    --danger: #b03a2e;
+    --danger-soft: #fbe9e6;
+    --shadow: 0 1px 2px rgba(20, 30, 50, 0.05), 0 8px 24px rgba(20, 30, 50, 0.06);
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 7px;
+    --font-display: "IBM Plex Sans KR", "Noto Sans KR", sans-serif;
+    --font-body: "Noto Sans KR", "IBM Plex Sans KR", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10141d;
+      --surface: #171d2a;
+      --surface-2: #1e2534;
+      --surface-3: #262e40;
+      --border: #2c3446;
+      --text: #e8ecf4;
+      --text-muted: #a2acc0;
+      --text-faint: #707c93;
+      --accent: #7ba3e8;
+      --accent-strong: #a7c4f2;
+      --accent-soft: #1c2c48;
+      --accent-soft-border: #2d4470;
+      --success: #6fd0a3;
+      --success-soft: #163329;
+      --pending: #e7b268;
+      --pending-soft: #362a14;
+      --open: #c3a0e8;
+      --open-soft: #2a2040;
+      --danger: #e2897c;
+      --danger-soft: #3a1f1c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10141d;
+    --surface: #171d2a;
+    --surface-2: #1e2534;
+    --surface-3: #262e40;
+    --border: #2c3446;
+    --text: #e8ecf4;
+    --text-muted: #a2acc0;
+    --text-faint: #707c93;
+    --accent: #7ba3e8;
+    --accent-strong: #a7c4f2;
+    --accent-soft: #1c2c48;
+    --accent-soft-border: #2d4470;
+    --success: #6fd0a3;
+    --success-soft: #163329;
+    --pending: #e7b268;
+    --pending-soft: #362a14;
+    --open: #c3a0e8;
+    --open-soft: #2a2040;
+    --danger: #e2897c;
+    --danger-soft: #3a1f1c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  button, input, textarea, select { font-family: inherit; color: inherit; }
+  ::selection { background: var(--accent-soft-border); }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* ---------- header ---------- */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(155deg, var(--accent), var(--accent-strong));
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-weight: 500; font-size: 13px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .brand-text h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand-text p { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-2);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn[aria-selected="true"] {
+    background: var(--accent);
+    color: #fff;
+  }
+  .tab-btn .tab-icon { width: 15px; height: 15px; flex-shrink: 0; }
+  .tab-btn:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  main { max-width: 980px; margin: 0 auto; padding: 28px 20px 80px; }
+  .panel { display: none; }
+  .panel.is-active { display: block; animation: fade-in 0.2s ease; }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-intro { margin-bottom: 22px; }
+  .panel-intro h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .panel-intro p { color: var(--text-muted); font-size: 14px; margin-top: 6px; max-width: 60ch; }
+
+  /* ---------- FAQ ---------- */
+  .faq-toolbar {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 18px;
+  }
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-box svg {
+    position: absolute; left: 14px; width: 17px; height: 17px; color: var(--text-faint);
+    pointer-events: none;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 13px 14px 13px 40px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14.5px;
+  }
+  .search-box input::placeholder { color: var(--text-faint); }
+  .search-box input:focus { border-color: var(--accent); }
+
+  .chip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .chip {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .chip:hover { border-color: var(--accent-soft-border); color: var(--text); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent-soft);
+    border-color: var(--accent-soft-border);
+    color: var(--accent-strong);
+  }
+
+  .result-meta {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin: 16px 2px 10px;
+    font-family: var(--font-mono);
+  }
+
+  .faq-list { display: flex; flex-direction: column; gap: 8px; }
+  .faq-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .faq-q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .faq-badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border: 1px solid var(--accent-soft-border);
+    white-space: nowrap;
+  }
+  .faq-q-text { flex: 1; font-size: 14.5px; font-weight: 600; color: var(--text); }
+  .faq-chevron { width: 16px; height: 16px; color: var(--text-faint); flex-shrink: 0; transition: transform 0.18s ease; }
+  .faq-item[data-open="true"] .faq-chevron { transform: rotate(180deg); }
+  .faq-answer {
+    display: none;
+    padding: 0 16px 18px 16px;
+    font-size: 13.8px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .faq-item[data-open="true"] .faq-answer { display: block; }
+  .faq-answer p { margin: 0 0 10px; white-space: pre-line; }
+  .faq-answer p:last-child { margin-bottom: 0; }
+  .faq-answer strong { color: var(--text); }
+  .faq-meta-line {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+  }
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-faint);
+    font-size: 13.5px;
+  }
+
+  /* ---------- Chat ---------- */
+  .chat-shell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    height: 560px;
+    overflow: hidden;
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .msg { display: flex; gap: 10px; max-width: 88%; }
+  .msg.from-user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  }
+  .msg.from-bot .msg-avatar { background: var(--accent-soft); color: var(--accent-strong); border: 1px solid var(--accent-soft-border); }
+  .msg.from-user .msg-avatar { background: var(--surface-3); color: var(--text-muted); }
+  .msg-bubble {
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13.8px;
+  }
+  .msg.from-bot .msg-bubble { background: var(--surface-2); border: 1px solid var(--border); border-top-left-radius: 3px; }
+  .msg.from-user .msg-bubble { background: var(--accent); color: #fff; border-top-right-radius: 3px; }
+  .msg-bubble p { white-space: pre-line; margin: 0 0 8px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-source {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .msg-source:hover { background: var(--accent-soft-border); }
+  .msg-follow { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chat-suggestions {
+    padding: 0 20px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .suggestion-chip {
+    border: 1px solid var(--accent-soft-border);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 8px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .suggestion-chip:hover { background: var(--accent-soft-border); }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .chat-input-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    font-size: 14px;
+  }
+  .chat-input-row input:focus { border-color: var(--accent); background: var(--surface); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0 20px;
+    font-weight: 600;
+    font-size: 13.8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 9px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { border-color: var(--accent-soft-border); }
+
+  /* ---------- Support ---------- */
+  .support-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .support-grid { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 22px;
+  }
+  .card h3 { font-size: 15.5px; font-weight: 700; margin-bottom: 4px; }
+  .card .card-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; }
+
+  .field { margin-bottom: 15px; }
+  .field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .field .req { color: var(--danger); }
+  .field input[type="text"],
+  .field input[type="tel"],
+  .field textarea,
+  .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    font-size: 13.8px;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .file-drop {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--surface-2);
+    font-size: 12.8px;
+    color: var(--text-muted);
+  }
+  .file-drop:hover { border-color: var(--accent-soft-border); }
+  .file-drop input { display: none; }
+  .image-preview {
+    margin-top: 10px;
+    position: relative;
+    display: inline-block;
+  }
+  .image-preview img {
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    display: block;
+  }
+  .image-preview .remove-img {
+    position: absolute; top: -8px; right: -8px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--danger); color: #fff; border: 2px solid var(--surface);
+    font-size: 13px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .form-note { font-size: 11.8px; color: var(--text-faint); margin-top: 14px; line-height: 1.6; }
+
+  .stat-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    flex: 1;
+    min-width: 92px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .stat-pill .num { font-family: var(--font-mono); font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat-pill .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .ticket-list { display: flex; flex-direction: column; gap: 10px; max-height: 620px; overflow-y: auto; padding-right: 2px; }
+  .ticket-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    background: var(--surface-2);
+  }
+  .ticket-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .ticket-who { font-size: 13.5px; font-weight: 700; }
+  .ticket-who span { font-weight: 500; color: var(--text-muted); font-size: 12px; }
+  .ticket-id { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); }
+  .status-pill {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  }
+  .status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status-접수 { background: var(--open-soft); color: var(--open); }
+  .status-처리중 { background: var(--pending-soft); color: var(--pending); }
+  .status-완료 { background: var(--success-soft); color: var(--success); }
+  .ticket-cat {
+    display: inline-block; font-size: 11px; font-weight: 600; color: var(--text-muted);
+    background: var(--surface-3); padding: 2px 8px; border-radius: 6px; margin-bottom: 8px;
+  }
+  .ticket-desc { font-size: 13px; color: var(--text); white-space: pre-line; margin-bottom: 8px; }
+  .ticket-img { max-width: 140px; border-radius: 6px; border: 1px solid var(--border); cursor: zoom-in; display: block; margin-bottom: 8px; }
+  .ticket-controls { display: flex; gap: 6px; align-items: flex-start; border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 4px; }
+  .ticket-controls select {
+    padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); font-size: 12px;
+  }
+  .ticket-controls textarea {
+    flex: 1; min-height: 34px; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); font-size: 12px; resize: vertical;
+  }
+  .ticket-controls button { flex-shrink: 0; }
+  .ticket-meta-time { font-size: 10.5px; color: var(--text-faint); font-family: var(--font-mono); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent-strong);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
+  }
+  .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(10, 14, 22, 0.82);
+    display: none; align-items: center; justify-content: center; z-index: 60; padding: 30px;
+  }
+  .lightbox.is-open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+
+  footer {
+    max-width: 980px; margin: 0 auto; padding: 0 20px 40px;
+    color: var(--text-faint); font-size: 12px; text-align: center;
+  }
+
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+</style>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">UW</div>
+      <div class="brand-text">
+        <h1>UWIN 지원센터</h1>
+        <p>울산대학교 그룹웨어 · 정보인프라팀</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="주요 메뉴">
+      <button class="tab-btn" role="tab" data-tab="faq" aria-selected="true">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="20" y1="20" x2="16.5" y2="16.5"></line></svg>
+        FAQ
+      </button>
+      <button class="tab-btn" role="tab" data-tab="chat" aria-selected="false">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        챗봇
+      </button>
+      <button class="tab-btn" role="tab" data-tab="support" aria-selected="false">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+        기술지원
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- FAQ PANEL -->
+  <section class="panel is-active" id="panel-faq" data-panel="faq">
+    <div class="panel-intro">
+      <h2>자주 하는 질문</h2>
+      <p>업무 중 자주 막히거나 실수하기 쉬운 그룹웨어(UWIN) 사용법을 모았습니다. 키워드로 검색하거나 분류를 눌러 찾아보세요.</p>
+    </div>
+    <div class="faq-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="20" y1="20" x2="16.5" y2="16.5"></line></svg>
+        <input type="text" id="faq-search" placeholder="예: 팝업, 웹메일 로그인, 팀사이트..." autocomplete="off">
+      </div>
+      <div class="chip-row" id="faq-chips"></div>
+    </div>
+    <p class="result-meta" id="faq-result-meta"></p>
+    <div class="faq-list" id="faq-list"></div>
+  </section>
+
+  <!-- CHAT PANEL -->
+  <section class="panel" id="panel-chat" data-panel="chat">
+    <div class="panel-intro">
+      <h2>그룹웨어 챗봇</h2>
+      <p>궁금한 점을 문장으로 편하게 물어보세요. FAQ에서 가장 관련 있는 답변을 찾아드립니다.</p>
+    </div>
+    <div class="chat-shell">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-suggestions" id="chat-suggestions"></div>
+      <form class="chat-input-row" id="chat-form">
+        <input type="text" id="chat-input" placeholder="질문을 입력하세요..." autocomplete="off">
+        <button type="submit" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          전송
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SUPPORT PANEL -->
+  <section class="panel" id="panel-support" data-panel="support">
+    <div class="panel-intro">
+      <h2>기술지원 접수</h2>
+      <p>FAQ로 해결되지 않는 오류는 아래 양식으로 접수해 주세요. 담당자가 확인 후 처리 상태를 업데이트합니다.</p>
+    </div>
+    <div class="support-grid">
+      <div class="card">
+        <h3>오류 접수하기</h3>
+        <p class="card-sub">증상을 최대한 자세히 적어주시면 처리 시간이 단축됩니다.</p>
+        <form id="support-form">
+          <div class="field-row">
+            <div class="field">
+              <label for="f-name">이름 <span class="req">*</span></label>
+              <input type="text" id="f-name" required>
+            </div>
+            <div class="field">
+              <label for="f-dept">소속(부서) <span class="req">*</span></label>
+              <input type="text" id="f-dept" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="f-contact">연락처(내선/이메일)</label>
+              <input type="text" id="f-contact" placeholder="선택 입력">
+            </div>
+            <div class="field">
+              <label for="f-category">오류 유형 <span class="req">*</span></label>
+              <select id="f-category" required>
+                <option value="">선택하세요</option>
+                <option>로그인/계정</option>
+                <option>전자결재/공문</option>
+                <option>메일</option>
+                <option>팀사이트</option>
+                <option>모바일 앱</option>
+                <option>화면 표시 오류</option>
+                <option>기타</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-desc">증상 설명 <span class="req">*</span></label>
+            <textarea id="f-desc" required placeholder="언제, 어떤 화면에서, 어떤 오류가 발생했는지 적어주세요."></textarea>
+          </div>
+          <div class="field">
+            <label>화면 캡처 첨부 <span style="font-weight:500; color:var(--text-faint);">(선택, 1장)</span></label>
+            <label class="file-drop" id="file-drop-label">
+              <input type="file" id="f-image" accept="image/*">
+              <span id="file-drop-text">클릭하여 이미지 선택</span>
+            </label>
+            <div class="image-preview" id="image-preview" style="display:none;">
+              <img id="image-preview-img" alt="첨부 이미지 미리보기">
+              <button type="button" class="remove-img" id="remove-img" aria-label="이미지 제거">×</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="support-submit" style="width:100%; justify-content:center; padding:12px 0; margin-top:6px;">접수하기</button>
+          <p class="form-note">접수된 내용은 이 페이지의 "접수 현황"에 저장되며, 담당자가 확인 후 처리합니다. 이메일·Teams 자동 알림 연동은 준비 중입니다.</p>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>접수 현황</h3>
+        <p class="card-sub">담당자 확인용 목록입니다. 상태를 바꾸고 처리 메모를 남길 수 있습니다.</p>
+        <div class="stat-row" id="ticket-stats"></div>
+        <div class="ticket-list" id="ticket-list"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  그룹웨어(UWIN) 관련 문의는 정보인프라팀으로 연락해 주세요 · UWIN 지원센터
+</footer>
+
+<div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox"><img id="lightbox-img" alt="첨부 이미지 확대보기"></div>
+
+<script id="app-state" type="application/json">{"tickets":[]}</script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* capture the served document verbatim, before any script mutates it,
+     so it can be regenerated later with fresh state and republished */
+  var ORIGINAL_DOC = "<!doctype html>\n" + document.documentElement.outerHTML;
+  var STATE_OPEN_TAG = '<script id="app-state" type="application/json">';
+
+  function buildDocWithState(state) {
+    var startIdx = ORIGINAL_DOC.indexOf(STATE_OPEN_TAG);
+    if (startIdx === -1) return null;
+    var contentStart = startIdx + STATE_OPEN_TAG.length;
+    var endIdx = ORIGINAL_DOC.indexOf("</scr" + "ipt>", contentStart);
+    if (endIdx === -1) return null;
+    var prefix = ORIGINAL_DOC.slice(0, contentStart);
+    var suffix = ORIGINAL_DOC.slice(endIdx);
+    /* escape '<' so a ticket description could never smuggle a literal
+       closing script tag into the regenerated document */
+    var safeJson = JSON.stringify(state).replace(/</g, "\\u003c");
+    return prefix + safeJson + suffix;
+  }
+
+  var state = { tickets: [] };
+  try {
+    var raw = document.getElementById("app-state").textContent;
+    var parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.tickets)) state = parsed;
+  } catch (e) { /* keep default */ }
+
+  var artifactAPI = null;
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("artifact").then(function (ns) { artifactAPI = ns; }).catch(function () { artifactAPI = null; });
+  }
+
+  /* ---------------- FAQ DATA ---------------- */
+  var CATEGORIES = [
+    { id: "install", label: "설치·접속" },
+    { id: "display", label: "화면·환경설정" },
+    { id: "teamsite", label: "팀사이트" },
+    { id: "approval", label: "전자결재·공문" },
+    { id: "mail", label: "메일" },
+    { id: "system", label: "시스템 안내" }
+  ];
+  var CAT_LABEL = {};
+  CATEGORIES.forEach(function (c) { CAT_LABEL[c.id] = c.label; });
+
+  var FAQ_DATA = [
+    {
+      id: 1, cat: "install",
+      q: "그룹웨어 모바일 앱은 어떻게 설치하나요?",
+      a: "모바일 그룹웨어 앱은 Play스토어나 App Store가 아닌 학교 설치 페이지에서 직접 설치합니다.\n\n1. 스마트폰 브라우저(크롬, 사파리 등) 주소창에 mgw.ulsan.ac.kr 입력\n2. [모바일 그룹웨어 설치] 버튼 선택\n3. 화면 안내에 따라 설치 진행\n\n※ 설치 중 \"출처를 알 수 없는 앱\" 등의 보안 안내가 나올 수 있지만, 스토어 외부 설치 시 항상 뜨는 정상 절차이니 안심하고 진행하세요. 학교가 공식 배포하는 앱입니다.\n※ 아이폰은 설치 후 [설정 → 일반 → VPN 및 기기 관리]에서 '신뢰' 설정까지 완료해야 앱이 실행됩니다.\n\n기종별 상세 설치 방법은 첨부 매뉴얼(안드로이드/아이폰 설치 매뉴얼, 모바일 그룹웨어 사용자 매뉴얼)을 참고하세요.",
+      tags: ["모바일", "앱", "설치", "mgw", "안드로이드", "아이폰", "폰", "스마트폰"]
+    },
+    {
+      id: 2, cat: "install",
+      q: "신규 임용 교직원인데 웹메일 로그인이 안 됩니다. (Microsoft 365 가입 방법)",
+      a: "계정에 문제가 생긴 것이 아니니 걱정하지 않으셔도 됩니다. 학교 웹메일은 Microsoft 365 계정으로 동작하는데, 신규 임용 교직원은 아직 이 가입이 되어 있지 않아 로그인이 안 되는 경우가 대부분입니다. 처음 한 번만 가입하면 이후 바로 이용할 수 있고 5분이면 충분합니다. 준비물은 그룹웨어(UWIN) 아이디와 비밀번호뿐입니다.\n\n가입 절차 (7단계)\n1. 그룹웨어 로그인: uwin.ulsan.ac.kr 접속 후 메인 화면 My Link 목록에서 웹메일(O365) 클릭 (목록에 없으면 검색창에 \"O365\" 입력)\n2. 울산대학교 클라우드: 그룹웨어와 동일한 UWIN 아이디/비밀번호로 로그인 (새 비밀번호 아님)\n3. 서비스 선택: 오른쪽 Microsoft 365 아이콘 클릭\n4. 약관 동의: 필수 체크박스 2개 모두 체크 후 [다음]\n5. 비밀번호 만들기: Microsoft 365용 새 비밀번호 설정 후 [Microsoft 365 계정 생성] (아이디는 UWIN아이디@mail.ulsan.ac.kr 형식으로 자동 생성)\n6. 클라우드 재접속: Outlook·OneDrive·Office 아이콘 활성화 확인\n7. Microsoft 로그인: 5단계에서 만든 비밀번호로 로그인하면 가입 완료\n\n꼭 기억하세요: 비밀번호가 두 개입니다. 2단계는 그룹웨어(UWIN) 비밀번호, 7단계 이후 Microsoft 서비스 로그인은 5단계에서 만든 비밀번호를 사용합니다.\n\n가입이 끝나면 웹메일뿐 아니라 워드·엑셀·파워포인트, OneDrive, Teams까지 무료로 이용할 수 있고, 스마트폰에 Outlook·Teams 앱을 설치해 같은 계정으로 로그인하면 외부에서도 메일을 확인할 수 있습니다.\n\n자주 함께 묻는 질문\nQ. 비밀번호를 잊어버렸어요 → Microsoft 로그인 창의 \"암호를 잊어버렸음\"을 눌러 재설정하거나 담당자에게 문의\nQ. Office 프로그램을 제 PC에 설치할 수 있나요 → 네, 가능합니다. 6단계 화면에서 Office 아이콘을 클릭하면 설치파일을 받을 수 있습니다.",
+      tags: ["웹메일", "로그인", "안됨", "신규", "임용", "m365", "office365", "오피스365", "가입", "아웃룩", "outlook", "비밀번호", "메일"]
+    },
+    {
+      id: 3, cat: "display",
+      q: "전자결재·게시판에서 자꾸 뜨는 팝업창이 불편해요. 안 뜨게 할 수 있나요?",
+      a: "환경설정에서 '미리보기' 방식으로 바꾸면 팝업창 없이 화면 우측에서 바로 내용을 확인할 수 있습니다.\n\n설정 방법 (팝업 → 미리보기 전환)\n1. 그룹웨어 우측 상단 [환경설정(톱니바퀴)] 이동\n2. 목록/뷰어 설정에서 보기 방식을 [미리보기]로 선택 후 저장\n3. 이후 문서를 선택하면 화면 우측에 미리보기 창이 나타나 팝업 없이 바로 읽을 수 있음\n\n다시 팝업(새창)으로 크게 보고 싶을 때: 우측 미리보기 창 상단(인쇄 아이콘 옆) [문서 2개가 겹쳐진 아이콘(새창 띄우기)]을 클릭하면 기존처럼 팝업창으로 열립니다.",
+      tags: ["미리보기", "팝업", "환경설정", "전자결재", "게시판", "뷰어"]
+    },
+    {
+      id: 4, cat: "teamsite",
+      q: "팀사이트 초대 및 가입이 되지 않아요.",
+      a: "교내 팀사이트 초대·가입 시 알림 확인이나 최종 승인 단계에서 누락이 생겨 가입이 완료되지 않는 경우가 있습니다. 아래 3단계를 순서대로 확인하세요.\n\n1단계. 초대 발송 및 메일 확인 (초대자)\n- 팀사이트에서 다시 한번 초대 진행\n- 유의사항: 초대 메일은 단순 안내/알림용입니다. 메일 본문에서 직접 가입되지 않으며, 2단계의 그룹웨어 웹알림을 통해 가입해야 합니다.\n\n2단계. 알림 환경설정 및 가입 수락 (초대받은 사람)\n1. 그룹웨어 설정 → 알림환경설정 → [팀사이트] 항목의 [웹알림]이 체크되어 있는지 확인 후 저장\n2. 우측 상단 [종 모양(알림)] 아이콘 클릭 → \"OOO님이 팀사이트에 초대하셨습니다\" 알림 클릭 → 팝업창에서 [팀사이트 가입하기] 클릭\n\n3단계. 가입 신청 승인 (팀사이트 관리자)\n초대받은 사람이 수락하면 관리자 승인 대기 상태가 되며, 팀사이트 관리자가 [멤버/권한설정 → 멤버승인 관리]에서 신청 내역을 확인 후 [수락]을 눌러야 최종 완료됩니다.\n\n요약: 웹알림 체크 → 종 모양 알림에서 [가입하기] 클릭 → 관리자 [수락]",
+      tags: ["팀사이트", "초대", "가입", "웹알림", "승인", "알림"]
+    },
+    {
+      id: 5, cat: "display",
+      q: "팝업창이 잠깐 빈 화면으로 나타났다가 사라져요.",
+      a: "팝업창(내부품의, 근태 등) 허용이 안 되어 있을 때 발생합니다. 컴퓨터를 새로 사거나 OS를 새로 설치한 경우 자주 나타납니다.\n\n크롬(Chrome) 설정 방법\n1. 브라우저 우측 상단 [⋮] → [설정]\n2. [개인정보 및 보안] → [사이트 설정] → [팝업 및 리디렉션]\n3. '팝업 전송 및 리디렉션 사용이 허용됨' 항목의 [추가] 클릭\n4. 주소창에 [*.]ulsan.ac.kr 입력 후 [추가]\n\n엣지(Edge) 설정 방법\n1. 우측 상단 [⋯] → [설정]\n2. [개인 정보, 검색 및 서비스] → [사이트 사용 권한] → [모든 사용 권한] → [팝업 및 리디렉션]\n3. [팝업 전송 및 리디렉션 사용 허용] 오른쪽 [사이트 추가] 클릭\n4. [*.]ulsan.ac.kr 입력 후 [추가]\n\n설정을 완료하면 전자결재 등 업무 관련 팝업창이 차단 없이 정상적으로 열립니다.",
+      tags: ["팝업", "빈화면", "사라짐", "크롬", "엣지", "차단", "허용", "chrome", "edge"]
+    },
+    {
+      id: 6, cat: "approval",
+      q: "외부로 발송한 전자문서가 수신 기관에서 보이지 않는대요.",
+      a: "주요 원인은 '비표준 기호 사용'과 '복사한 웹 서식 혼입'일 가능성이 높습니다.\n\n1. 텍스트 작성 방식 확인 (가장 흔한 원인)\n원인: 웹 브라우저나 AI(ChatGPT 등) 답변을 그대로 복사해 붙여넣으면 눈에 보이지 않는 HTML 태그나 특수 코드가 포함되어 공문 유통 시스템의 무결성이 깨지고, 수신 측에서 문서가 차단되거나 깨질 수 있습니다.\n조치: 기안문에서 직접 작성하거나, 한글 프로그램에 먼저 붙여넣어 특수 서식을 제거한 뒤 복사해 기안문에 넣으세요.\n\n2. 특수기호·글머리 기호 수정\n원인: 전자공문 유통 표준(EUC-KR 기반)에 없는 특수기호를 쓰면 '?'로 치환되어 렌더링 오류가 생깁니다.\n조치: '?'로 치환된 흔적이 있다면 표준 기호(○, ●, ◎, □, ■, △, ▲ 등)로 바꿔 재기안하세요.\n\n3. 작성 팁\n\"아 래\", \"참석자 명단\", \"식순\" 등에 쓰인 글머리 기호가 표준 사각형·원형인지 발송 전 확인하면 대부분의 수신 오류를 예방할 수 있습니다.",
+      tags: ["외부", "발송", "전자문서", "수신", "오류", "안보임", "비표준기호", "물음표", "공문"]
+    },
+    {
+      id: 7, cat: "approval",
+      q: "외부 발송 문서 수신처가 너무 많을 때 간단히 표시하는 방법이 있나요?",
+      a: "네, 결재정보 설정의 '수신자 요약' 기능을 쓰면 됩니다. 수신처가 10곳 이상이면 개별 수신처를 모두 나열하는 대신 대표 명칭(예: 전국대학)으로 요약해 문서를 깔끔하게 만들 수 있습니다.\n\n설정 방법 (10개 이상 선택 시 활성화)\n1. [결재정보] → [수신자] 탭에서 발송할 수신처 선택\n2. 하단 [수신자 요약] 칸에 원하는 문구(예: 전국대학) 입력\n3. [확인] 클릭\n4. 문서 상단 '수신자'란에 개별 대학명 대신 입력한 요약 명칭이 표시되는지 확인",
+      tags: ["수신처", "요약", "전국대학", "결재정보", "수신자"]
+    },
+    {
+      id: 8, cat: "approval",
+      q: "외부 종이공문 접수·결재는 어떻게 하나요? 종이공문 대장 등록 기능이 없어졌나요?",
+      a: "행정 효율과 기록물 보관 안전을 위해 종이공문 관리 방식이 개편되었습니다. 별도 대장에 수기로 등록하던 방식은 종료되었고, 모든 종이공문은 '비전자 기록물' 양식으로 전자결재 시스템에 직접 등록해 통합 관리합니다.\n\n새 처리 절차 (5단계)\n1. 스캔하기: 수신한 종이공문을 PDF 등으로 스캔\n2. 메뉴 접속: 그룹웨어 접속 후 [결재] → [기안] 클릭\n3. 양식 선택: 문서 양식 목록에서 [비전자기록물공문] 선택\n4. 정보 입력: 공문 제목, 발신 기관 등 입력 및 스캔 파일 첨부\n5. 결재 상신: 결재 완료 시 등록 완료, 이후 시스템에서 언제든 조회 가능\n\n유의사항: 등록된 공문은 실시간으로 문서번호가 부여되어 관리가 쉬워집니다. 접수된 원본 종이문서는 부서 지침에 따라 안전하게 보관하세요.",
+      tags: ["종이공문", "접수", "비전자기록물", "스캔", "대장"]
+    },
+    {
+      id: 9, cat: "mail",
+      q: "그룹편지함을 찾을 수 없어요.",
+      a: "기존 그룹편지함 기능은 시스템 개편으로 종료되었고, 아래와 같이 두 기능으로 나뉘었습니다.\n- 전체 구성원 공지가 필요하면 → 게시판의 공지사항 이용\n- 특정 다수에게 메일 안내가 필요하면 → 대량(다중수신) 메일 기능 활용\n\n대량(다중수신) 메일 사용법은 공지사항의 「개편 그룹웨어 사용자 교육 영상 공유」 게시글을 참고하세요. (사용자교육 영상2, 4:20부터 대량메일 사용법 안내 / 붙임: 대량메일 사용자 매뉴얼)",
+      tags: ["그룹편지함", "공지사항", "대량메일", "다중수신"]
+    },
+    {
+      id: 10, cat: "approval",
+      q: "내부 수·발신 공문으로 결재해서 보냈는데 해당 부서에서 안 보인대요.",
+      a: "수신자를 '부서'가 아닌 '개인(특정 담당자)'으로 지정했기 때문일 가능성이 높습니다.\n\n[부서]를 수신자로 선택한 경우\n- 확인 위치: 해당 부서의 '부서수신함'\n- 부서원 전체가 공문 내용을 확인할 수 있음\n\n[개인(예: 팀장 등)]을 수신자로 선택한 경우\n- 확인 위치: 부서수신함 내에서 지정된 개인에게만 문서가 노출됨\n- 지정되지 않은 다른 부서원에게는 문서가 보이지 않음\n\n부서 전체가 공유해야 하는 문서라면 [부서]를, 특정 담당자만 처리해야 하는 문서라면 [개인]을 정확히 구분해 지정하세요.",
+      tags: ["내부", "수발신", "공문", "부서수신함", "안보임", "개인", "부서"]
+    },
+    {
+      id: 11, cat: "approval",
+      q: "전자결재 문서 기안 시 결재선에 포함된 사람만 열람하게 하려면 어떻게 하나요?",
+      a: "[전자결재 → 기안하기 → 결재정보 → 문서정보 → 열람권한]에서 '결재선 열람'을 선택하면 됩니다. 이렇게 설정하면 해당 문서는 결재선에 포함된 사용자만 열람할 수 있습니다.\n\n참고: 문서정보의 '공개여부' 항목은 외부 정보공개 여부를 설정하는 기능으로, 결재 문서의 내부 열람 권한(결재선 열람 설정)과는 관련이 없습니다.",
+      tags: ["결재선", "열람권한", "공개여부", "기안"]
+    },
+    {
+      id: 12, cat: "approval",
+      q: "교내·교외로 발송한 공문의 수신 여부를 확인하고 싶어요.",
+      a: "환경설정에서 결재선 보기 기능을 사용으로 설정하면 공문 문서에서 수신자 목록을 확인할 수 있습니다.\n\n설정 방법: [환경설정 → 결재환경설정 → 기본환경설정 → 결재선 보기] → '사용' 선택 후 저장\n\n설정을 사용으로 바꾸면 공문 문서에 수신자 목록이 표시되어 발송된 공문의 수신 대상을 확인할 수 있습니다.",
+      tags: ["수신여부", "결재선보기", "공문", "확인"]
+    },
+    {
+      id: 13, cat: "mail",
+      q: "교내 구성원에게 메일을 보내고 수신 여부를 확인하고 싶어요.",
+      a: "메일 작성 화면에서 옵션을 클릭한 뒤 추적 설정의 '수신확인' 항목이 기본으로 체크되도록 변경했습니다. 교내 메일에 한해 수신자가 메일을 확인했는지 여부를 확인할 수 있습니다. (외부메일은 수신확인이 어렵습니다.)",
+      tags: ["메일", "수신확인", "추적", "옵션"]
+    },
+    {
+      id: 14, cat: "mail",
+      q: "부서수신함에 온 공문(대내외) 메일에 본문 내용이 없어요.",
+      a: "그룹웨어 기능 개선으로 부서수신함에 발송되는 공문(대내·외) 메일의 본문에는 더 이상 공문 내용이 표시되지 않습니다. 기존에는 웹 에디터 방식이라 메일 본문에 내용이 함께 표시됐지만, 한글(HWP) 에디터 방식으로 바뀌면서 자동 삽입되지 않습니다. 대신 공문 내용은 메일 첨부파일에 PDF로 자동 생성되어 함께 발송되니, 첨부파일 목록 마지막의 PDF 파일을 확인해 주세요.",
+      tags: ["부서수신함", "메일", "본문", "pdf", "한글", "hwp"]
+    },
+    {
+      id: 15, cat: "approval",
+      q: "담당자 전결 기능이 없어졌나요?",
+      a: "'담당자 전결'이라는 문구가 화면에 표시되지 않도록 바뀌었을 뿐, 기능은 그대로 제공됩니다. 담당자가 결재 버튼을 클릭하면 확인 메시지가 표시되고, 확인 후 전결 처리가 가능합니다.",
+      tags: ["전결", "담당자", "결재버튼"]
+    },
+    {
+      id: 16, cat: "system",
+      q: "\"그룹웨어와 연동되므로 그룹웨어를 클릭하고 다시 신청하세요\"라는 메시지가 뜨면 어떻게 하나요?",
+      a: "이 메시지가 나오면 해당 프로그램의 경로를 확인해(예: 일반행정-구매관리-구매관리-구매요구등록) 정보인프라팀 이재원에게 메일이나 Teams로 연락해 주세요. 확인 후 빠른 시일 내 수정해 드립니다.",
+      tags: ["연동", "그룹웨어", "클릭", "재신청", "구매관리"]
+    },
+    {
+      id: 17, cat: "approval",
+      q: "과거 문서를 재사용할 수는 없나요?",
+      a: "이번 그룹웨어 개편으로 기존 웹기안기 방식에서 한글기안기 방식으로 바뀌었습니다. 기안기 방식이 서로 달라 과거(웹기안기) 문서는 현재 시스템에서 재사용이 어렵습니다. 다만 2026년 1학기 개편 그룹웨어의 한글기안기로 작성된 문서는 재사용할 수 있습니다.",
+      tags: ["과거", "문서", "재사용", "웹기안기", "한글기안기"]
+    }
+  ];
+
+  var SUGGESTED_QUESTIONS = [
+    "모바일 앱 어떻게 설치해요?",
+    "웹메일 로그인이 안 돼요",
+    "팝업창이 자꾸 떠요",
+    "팀사이트 가입이 안 돼요"
+  ];
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  /* ---------------- tabs ---------------- */
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = btn.getAttribute("data-tab");
+      tabButtons.forEach(function (b) { b.setAttribute("aria-selected", String(b === btn)); });
+      panels.forEach(function (p) { p.classList.toggle("is-active", p.getAttribute("data-panel") === target); });
+    });
+  });
+  function activateTab(name) {
+    var btn = document.querySelector('.tab-btn[data-tab="' + name + '"]');
+    if (btn) btn.click();
+  }
+
+  /* ---------------- FAQ rendering ---------------- */
+  var faqSearchInput = document.getElementById("faq-search");
+  var faqChipsEl = document.getElementById("faq-chips");
+  var faqListEl = document.getElementById("faq-list");
+  var faqMetaEl = document.getElementById("faq-result-meta");
+  var activeCategory = "all";
+
+  (function buildChips() {
+    var all = document.createElement("button");
+    all.className = "chip"; all.type = "button"; all.textContent = "전체";
+    all.setAttribute("aria-pressed", "true");
+    all.addEventListener("click", function () { setCategory("all", all); });
+    faqChipsEl.appendChild(all);
+    CATEGORIES.forEach(function (c) {
+      var chip = document.createElement("button");
+      chip.className = "chip"; chip.type = "button"; chip.textContent = c.label;
+      chip.setAttribute("aria-pressed", "false");
+      chip.addEventListener("click", function () { setCategory(c.id, chip); });
+      faqChipsEl.appendChild(chip);
+    });
+  })();
+
+  function setCategory(id, chipEl) {
+    activeCategory = id;
+    Array.prototype.forEach.call(faqChipsEl.children, function (c) { c.setAttribute("aria-pressed", "false"); });
+    chipEl.setAttribute("aria-pressed", "true");
+    renderFaqList();
+  }
+
+  function normalize(s) { return (s || "").toLowerCase().replace(/\s+/g, ""); }
+
+  function filterFaq() {
+    var q = normalize(faqSearchInput.value);
+    return FAQ_DATA.filter(function (item) {
+      if (activeCategory !== "all" && item.cat !== activeCategory) return false;
+      if (!q) return true;
+      var hay = normalize(item.q + " " + item.a + " " + item.tags.join(" "));
+      return hay.indexOf(q) !== -1;
+    });
+  }
+
+  function renderFaqList(openId) {
+    var results = filterFaq();
+    faqMetaEl.textContent = "전체 " + FAQ_DATA.length + "건 중 " + results.length + "건 표시";
+    faqListEl.innerHTML = "";
+    if (results.length === 0) {
+      faqListEl.innerHTML = '<div class="empty-state">검색 결과가 없습니다. 표현을 바꾸거나 챗봇에게 물어보세요.</div>';
+      return;
+    }
+    results.forEach(function (item) {
+      var el = document.createElement("div");
+      el.className = "faq-item";
+      el.dataset.open = String(item.id === openId);
+      var answerHtml = item.a.split("\n\n").map(function (para) {
+        return "<p>" + escapeHtml(para) + "</p>";
+      }).join("");
+      el.innerHTML =
+        '<button class="faq-q" type="button">' +
+          '<span class="faq-badge">' + CAT_LABEL[item.cat] + '</span>' +
+          '<span class="faq-q-text">' + escapeHtml(item.q) + '</span>' +
+          '<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+        '</button>' +
+        '<div class="faq-answer">' + answerHtml + '<div class="faq-meta-line">FAQ #' + item.id + '</div></div>';
+      el.querySelector(".faq-q").addEventListener("click", function () {
+        var isOpen = el.dataset.open === "true";
+        el.dataset.open = String(!isOpen);
+      });
+      faqListEl.appendChild(el);
+    });
+  }
+
+  faqSearchInput.addEventListener("input", function () { renderFaqList(); });
+  renderFaqList();
+
+  function openFaqInList(id) {
+    activateTab("faq");
+    var chipAll = faqChipsEl.children[0];
+    setCategory("all", chipAll);
+    faqSearchInput.value = "";
+    renderFaqList(id);
+    requestAnimationFrame(function () {
+      var el = faqListEl.children[FAQ_DATA.findIndex(function (f) { return f.id === id; })];
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  /* ---------------- Chatbot ---------------- */
+  var chatMessagesEl = document.getElementById("chat-messages");
+  var chatForm = document.getElementById("chat-form");
+  var chatInput = document.getElementById("chat-input");
+  var chatSuggestionsEl = document.getElementById("chat-suggestions");
+
+  function scoreItem(item, query) {
+    var nq = normalize(query);
+    if (!nq) return 0;
+    var score = 0;
+    item.tags.forEach(function (tag) {
+      if (nq.indexOf(normalize(tag)) !== -1) score += 3;
+    });
+    var hay = normalize(item.q + " " + item.a);
+    var shingles = [];
+    for (var i = 0; i < nq.length - 1; i++) shingles.push(nq.slice(i, i + 2));
+    var hits = 0;
+    shingles.forEach(function (sh) { if (hay.indexOf(sh) !== -1) hits++; });
+    score += (shingles.length ? hits / shingles.length : 0) * 4;
+    return score;
+  }
+
+  function findAnswers(query) {
+    return FAQ_DATA.map(function (item) { return { item: item, score: scoreItem(item, query) }; })
+      .sort(function (a, b) { return b.score - a.score; });
+  }
+
+  function addMessage(role, html) {
+    var msg = document.createElement("div");
+    msg.className = "msg from-" + role;
+    var avatar = role === "bot" ? "AI" : "나";
+    msg.innerHTML =
+      '<div class="msg-avatar">' + avatar + '</div>' +
+      '<div class="msg-bubble">' + html + '</div>';
+    chatMessagesEl.appendChild(msg);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    return msg;
+  }
+
+  function botAnswer(query) {
+    var ranked = findAnswers(query);
+    var top = ranked[0];
+    if (!top || top.score < 1.4) {
+      var html =
+        '<p>정확히 일치하는 답변을 찾지 못했어요. 표현을 조금 바꿔서 다시 물어보시거나, 아래에서 기술지원으로 바로 접수하실 수 있어요.</p>';
+      var bubble = addMessage("bot", html);
+      var btn = document.createElement("button");
+      btn.className = "msg-source"; btn.style.marginTop = "10px";
+      btn.textContent = "기술지원 접수하기 →";
+      btn.addEventListener("click", function () {
+        activateTab("support");
+        var descEl = document.getElementById("f-desc");
+        if (descEl) descEl.value = query;
+      });
+      bubble.querySelector(".msg-bubble").appendChild(btn);
+      return;
+    }
+    var firstPara = top.item.a.split("\n\n")[0];
+    var html = '<p><strong>' + escapeHtml(top.item.q) + '</strong></p><p>' + escapeHtml(firstPara) + '</p>';
+    var bubble = addMessage("bot", html);
+    var srcBtn = document.createElement("button");
+    srcBtn.className = "msg-source";
+    srcBtn.textContent = "FAQ #" + top.item.id + " 전체 보기";
+    srcBtn.addEventListener("click", function () { openFaqInList(top.item.id); });
+    bubble.querySelector(".msg-bubble").appendChild(srcBtn);
+
+    var related = ranked.slice(1, 3).filter(function (r) { return r.score > 0.9; });
+    if (related.length) {
+      var follow = document.createElement("div");
+      follow.className = "msg-follow";
+      related.forEach(function (r) {
+        var chip = document.createElement("button");
+        chip.className = "suggestion-chip";
+        chip.style.padding = "6px 11px"; chip.style.fontSize = "11.5px";
+        chip.textContent = r.item.q.length > 24 ? r.item.q.slice(0, 24) + "…" : r.item.q;
+        chip.addEventListener("click", function () { openFaqInList(r.item.id); });
+        follow.appendChild(chip);
+      });
+      bubble.querySelector(".msg-bubble").appendChild(follow);
+    }
+  }
+
+  function sendQuery(text) {
+    text = text.trim();
+    if (!text) return;
+    addMessage("user", "<p>" + escapeHtml(text) + "</p>");
+    chatInput.value = "";
+    chatSuggestionsEl.style.display = "none";
+    setTimeout(function () { botAnswer(text); }, 260);
+  }
+
+  chatForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    sendQuery(chatInput.value);
+  });
+
+  (function initChat() {
+    addMessage("bot", "<p>안녕하세요! UWIN 그룹웨어 사용 중 궁금한 점을 편하게 물어보세요. FAQ에서 가장 관련 있는 답변을 찾아드릴게요.</p>");
+    SUGGESTED_QUESTIONS.forEach(function (q) {
+      var chip = document.createElement("button");
+      chip.className = "suggestion-chip"; chip.type = "button"; chip.textContent = q;
+      chip.addEventListener("click", function () { sendQuery(q); });
+      chatSuggestionsEl.appendChild(chip);
+    });
+  })();
+
+  /* ---------------- Support form ---------------- */
+  var supportForm = document.getElementById("support-form");
+  var fImage = document.getElementById("f-image");
+  var fileDropLabel = document.getElementById("file-drop-label");
+  var fileDropText = document.getElementById("file-drop-text");
+  var imagePreview = document.getElementById("image-preview");
+  var imagePreviewImg = document.getElementById("image-preview-img");
+  var removeImgBtn = document.getElementById("remove-img");
+  var pendingImage = null;
+
+  fImage.addEventListener("change", function () {
+    var file = fImage.files && fImage.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        var maxW = 900;
+        var scale = Math.min(1, maxW / img.width);
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        pendingImage = canvas.toDataURL("image/jpeg", 0.75);
+        imagePreviewImg.src = pendingImage;
+        imagePreview.style.display = "inline-block";
+        fileDropText.textContent = file.name.length > 28 ? file.name.slice(0, 28) + "…" : file.name;
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  removeImgBtn.addEventListener("click", function () {
+    pendingImage = null;
+    fImage.value = "";
+    imagePreview.style.display = "none";
+    fileDropText.textContent = "클릭하여 이미지 선택";
+  });
+
+  function showToast(text) {
+    var toast = document.getElementById("toast");
+    toast.textContent = text;
+    toast.classList.add("is-visible");
+    setTimeout(function () { toast.classList.remove("is-visible"); }, 3200);
+  }
+
+  async function persistState() {
+    var html = buildDocWithState(state);
+    if (!html) { showToast("저장 형식 오류로 이 화면에서만 표시됩니다."); return false; }
+    if (!artifactAPI) { showToast("저장 기능을 사용할 수 없어 이 화면에서만 표시됩니다."); return false; }
+    try {
+      await artifactAPI.publish(html);
+      return true;
+    } catch (err) {
+      var code = err && err.code;
+      if (code === "conflict") return true; /* view is already reloading to the newer version */
+      showToast("저장에 실패했습니다. 이 화면에서만 임시로 표시됩니다.");
+      return false;
+    }
+  }
+
+  supportForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var submitBtn = document.getElementById("support-submit");
+    var ticket = {
+      id: "T" + Date.now().toString(36).toUpperCase(),
+      createdAt: new Date().toISOString(),
+      name: document.getElementById("f-name").value.trim(),
+      dept: document.getElementById("f-dept").value.trim(),
+      contact: document.getElementById("f-contact").value.trim(),
+      category: document.getElementById("f-category").value,
+      description: document.getElementById("f-desc").value.trim(),
+      image: pendingImage,
+      status: "접수",
+      memo: ""
+    };
+    if (!ticket.name || !ticket.dept || !ticket.category || !ticket.description) return;
+
+    state.tickets = [ticket].concat(state.tickets);
+    renderTickets();
+
+    submitBtn.disabled = true; submitBtn.textContent = "접수 중...";
+    supportForm.reset();
+    removeImgBtn.click();
+    var ok = await persistState();
+    submitBtn.disabled = false; submitBtn.textContent = "접수하기";
+    showToast(ok ? "접수되었습니다. 확인 후 회신드리겠습니다." : "접수는 되었지만 저장에 문제가 있어요.");
+  });
+
+  /* ---------------- Ticket list / admin ---------------- */
+  var ticketListEl = document.getElementById("ticket-list");
+  var ticketStatsEl = document.getElementById("ticket-stats");
+  var STATUS_OPTIONS = ["접수", "처리중", "완료"];
+
+  function formatDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    var pad = function (n) { return String(n).padStart(2, "0"); };
+    return (d.getMonth() + 1) + "/" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+
+  function renderTickets() {
+    var counts = { "접수": 0, "처리중": 0, "완료": 0 };
+    state.tickets.forEach(function (t) { counts[t.status] = (counts[t.status] || 0) + 1; });
+    ticketStatsEl.innerHTML =
+      statPill(state.tickets.length, "전체") +
+      statPill(counts["접수"], "접수") +
+      statPill(counts["처리중"], "처리중") +
+      statPill(counts["완료"], "완료");
+
+    if (state.tickets.length === 0) {
+      ticketListEl.innerHTML = '<div class="empty-state">아직 접수된 문의가 없습니다.</div>';
+      return;
+    }
+    ticketListEl.innerHTML = "";
+    state.tickets.forEach(function (t) {
+      var card = document.createElement("div");
+      card.className = "ticket-card";
+      card.innerHTML =
+        '<div class="ticket-head">' +
+          '<div><div class="ticket-who">' + escapeHtml(t.name) + ' <span>' + escapeHtml(t.dept) + '</span></div>' +
+          '<div class="ticket-id">' + t.id + ' · ' + formatDate(t.createdAt) + '</div></div>' +
+          '<span class="status-pill status-' + t.status + '">' + t.status + '</span>' +
+        '</div>' +
+        '<span class="ticket-cat">' + escapeHtml(t.category) + '</span>' +
+        '<div class="ticket-desc">' + escapeHtml(t.description) + '</div>' +
+        (t.image ? '<img class="ticket-img" src="' + t.image + '" alt="첨부 캡처">' : '') +
+        (t.contact ? '<div class="ticket-meta-time" style="margin-bottom:8px;">연락처: ' + escapeHtml(t.contact) + '</div>' : '') +
+        '<div class="ticket-controls">' +
+          '<select class="t-status"></select>' +
+          '<textarea class="t-memo" placeholder="처리 메모">' + escapeHtml(t.memo || "") + '</textarea>' +
+          '<button type="button" class="btn-secondary t-save">저장</button>' +
+        '</div>';
+
+      var select = card.querySelector(".t-status");
+      STATUS_OPTIONS.forEach(function (s) {
+        var opt = document.createElement("option");
+        opt.value = s; opt.textContent = s;
+        if (s === t.status) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      var img = card.querySelector(".ticket-img");
+      if (img) {
+        img.addEventListener("click", function () {
+          document.getElementById("lightbox-img").src = t.image;
+          document.getElementById("lightbox").classList.add("is-open");
+        });
+      }
+
+      card.querySelector(".t-save").addEventListener("click", async function () {
+        var btn = this;
+        var newStatus = select.value;
+        var newMemo = card.querySelector(".t-memo").value;
+        var idx = state.tickets.findIndex(function (x) { return x.id === t.id; });
+        if (idx === -1) return;
+        state.tickets[idx] = Object.assign({}, state.tickets[idx], { status: newStatus, memo: newMemo });
+        renderTickets();
+        btn.disabled = true; btn.textContent = "저장 중...";
+        var ok = await persistState();
+        showToast(ok ? "상태가 저장되었습니다." : "저장에 실패했습니다.");
+      });
+
+      ticketListEl.appendChild(card);
+    });
+  }
+
+  function statPill(num, label) {
+    return '<div class="stat-pill"><div class="num">' + num + '</div><div class="lbl">' + label + '</div></div>';
+  }
+
+  renderTickets();
+
+  document.getElementById("lightbox").addEventListener("click", function () {
+    this.classList.remove("is-open");
+  });
+})();
+</script>
