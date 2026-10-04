@@ -1,86 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UWIN 지원센터</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
-    --bg: #f4f6fa;
+    --bg: #F7F7F5;
     --surface: #ffffff;
-    --surface-2: #edf1f7;
-    --surface-3: #e4e9f1;
-    --border: #dde3ec;
-    --text: #19212f;
-    --text-muted: #5b6478;
-    --text-faint: #8790a1;
-    --accent: #1e4b8f;
-    --accent-strong: #12345f;
-    --accent-soft: #e7eefb;
-    --accent-soft-border: #cddcf3;
-    --success: #227a53;
-    --success-soft: #e4f4ec;
-    --pending: #ad6a12;
-    --pending-soft: #fbeedb;
-    --open: #7a3fb0;
-    --open-soft: #f1e8fa;
-    --danger: #b03a2e;
-    --danger-soft: #fbe9e6;
-    --shadow: 0 1px 2px rgba(20, 30, 50, 0.05), 0 8px 24px rgba(20, 30, 50, 0.06);
-    --radius-lg: 16px;
-    --radius-md: 10px;
-    --radius-sm: 7px;
-    --font-display: "IBM Plex Sans KR", "Noto Sans KR", sans-serif;
-    --font-body: "Noto Sans KR", "IBM Plex Sans KR", sans-serif;
-    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+    --surface-2: #F0F0F0;
+    --surface-3: #E5E5E5;
+    --border: #E5E5E5;
+    --text: #1A1A1A;
+    --text-muted: #666666;
+    --text-faint: #999999;
+    --accent: #006B3C;
+    --accent-strong: #004D2B;
+    --accent-soft: #E6F2EB;
+    --accent-soft-border: #BFDCCB;
+    --success: #1F7A4D;
+    --success-soft: #E4F4EC;
+    --pending: #8A5A00;
+    --pending-soft: #FFF3D1;
+    --open: #0066B2;
+    --open-soft: #E3F0FA;
+    --danger: #C62F3B;
+    --danger-soft: #FCE8EA;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 4px;
+    --font-display: "YoonGothic", "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    --font-body: "YoonGothic", "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #10141d;
-      --surface: #171d2a;
-      --surface-2: #1e2534;
-      --surface-3: #262e40;
-      --border: #2c3446;
-      --text: #e8ecf4;
-      --text-muted: #a2acc0;
-      --text-faint: #707c93;
-      --accent: #7ba3e8;
-      --accent-strong: #a7c4f2;
-      --accent-soft: #1c2c48;
-      --accent-soft-border: #2d4470;
-      --success: #6fd0a3;
+      --bg: #0F1512;
+      --surface: #17201B;
+      --surface-2: #1F2A24;
+      --surface-3: #2A372F;
+      --border: #2B3A31;
+      --text: #ECF1EE;
+      --text-muted: #A6B3AB;
+      --text-faint: #75857B;
+      --accent: #4FB07F;
+      --accent-strong: #7CCBA2;
+      --accent-soft: #163626;
+      --accent-soft-border: #25553C;
+      --success: #6FD0A3;
       --success-soft: #163329;
-      --pending: #e7b268;
-      --pending-soft: #362a14;
-      --open: #c3a0e8;
-      --open-soft: #2a2040;
-      --danger: #e2897c;
-      --danger-soft: #3a1f1c;
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+      --pending: #F2C14E;
+      --pending-soft: #3A2E12;
+      --open: #6AB4EA;
+      --open-soft: #14293A;
+      --danger: #EE8B93;
+      --danger-soft: #3A1F22;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
   }
 
   :root[data-theme="dark"] {
-    --bg: #10141d;
-    --surface: #171d2a;
-    --surface-2: #1e2534;
-    --surface-3: #262e40;
-    --border: #2c3446;
-    --text: #e8ecf4;
-    --text-muted: #a2acc0;
-    --text-faint: #707c93;
-    --accent: #7ba3e8;
-    --accent-strong: #a7c4f2;
-    --accent-soft: #1c2c48;
-    --accent-soft-border: #2d4470;
-    --success: #6fd0a3;
+    --bg: #0F1512;
+    --surface: #17201B;
+    --surface-2: #1F2A24;
+    --surface-3: #2A372F;
+    --border: #2B3A31;
+    --text: #ECF1EE;
+    --text-muted: #A6B3AB;
+    --text-faint: #75857B;
+    --accent: #4FB07F;
+    --accent-strong: #7CCBA2;
+    --accent-soft: #163626;
+    --accent-soft-border: #25553C;
+    --success: #6FD0A3;
     --success-soft: #163329;
-    --pending: #e7b268;
-    --pending-soft: #362a14;
-    --open: #c3a0e8;
-    --open-soft: #2a2040;
-    --danger: #e2897c;
-    --danger-soft: #3a1f1c;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --pending: #F2C14E;
+    --pending-soft: #3A2E12;
+    --open: #6AB4EA;
+    --open-soft: #14293A;
+    --danger: #EE8B93;
+    --danger-soft: #3A1F22;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   * { box-sizing: border-box; }
@@ -567,8 +573,45 @@
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap;
   }
-</style>
 
+  /* ---------- UOU theme overrides (DESIGN-UOU: UOU Green) ---------- */
+  body { letter-spacing: -0.01em; line-height: 1.7; }
+  h1, h2, h3, h4 { letter-spacing: -0.02em; }
+  .site-header {
+    background: #004D2B;
+    backdrop-filter: none;
+    border-bottom: 0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  .header-inner { max-width: 1080px; padding: 18px 20px 0; align-items: flex-end; }
+  .brand { padding-bottom: 14px; }
+  .brand-mark {
+    width: 42px; height: 42px; border-radius: 4px;
+    background: #fff; color: #006B3C;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+  }
+  .brand-text h1 { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
+  .brand-text p { color: #D0D0D0; font-size: 13px; }
+  .tabs { background: transparent; border: 0; padding: 0; border-radius: 0; gap: 4px; }
+  .tab-btn {
+    color: #D0D0D0; border-radius: 0; padding: 14px 18px; font-size: 15px;
+    border-bottom: 3px solid transparent;
+  }
+  .tab-btn:hover { color: #fff; }
+  .tab-btn[aria-selected="true"] { background: transparent; color: #fff; border-bottom-color: #fff; }
+  .site-header .tab-btn:focus-visible { outline: 2px solid #F2A900; outline-offset: -2px; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline-color: #F2A900; }
+  main { max-width: 1080px; }
+  .panel-intro h2 { font-size: 28px; letter-spacing: -0.03em; color: var(--accent-strong); }
+  .panel-intro p { font-size: 15px; }
+  footer { background: #F0F0F0; color: #666; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) footer { background: #17201B; color: #A6B3AB; }
+  }
+  :root[data-theme="dark"] footer { background: #17201B; color: #A6B3AB; }
+</style>
+</head>
+<body>
 <header class="site-header">
   <div class="header-inner">
     <div class="brand">
@@ -1263,3 +1306,5 @@
   });
 })();
 </script>
+</body>
+</html>
