@@ -679,67 +679,24 @@
   <section class="panel" id="panel-support" data-panel="support">
     <div class="panel-intro">
       <h2>기술지원 접수</h2>
-      <p>FAQ로 해결되지 않는 오류는 아래 양식으로 접수해 주세요. 담당자가 확인 후 처리 상태를 업데이트합니다.</p>
+      <p>FAQ로 해결되지 않는 오류는 아래 양식으로 접수해 주세요. 담당자에게 Teams로 알림이 전달되며, 확인 후 회신드립니다.</p>
     </div>
     <div class="support-grid">
       <div class="card">
         <h3>오류 접수하기</h3>
         <p class="card-sub">증상을 최대한 자세히 적어주시면 처리 시간이 단축됩니다.</p>
-        <form id="support-form">
-          <div class="field-row">
-            <div class="field">
-              <label for="f-name">이름 <span class="req">*</span></label>
-              <input type="text" id="f-name" required>
-            </div>
-            <div class="field">
-              <label for="f-dept">소속(부서) <span class="req">*</span></label>
-              <input type="text" id="f-dept" required>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="f-contact">연락처(내선/이메일)</label>
-              <input type="text" id="f-contact" placeholder="선택 입력">
-            </div>
-            <div class="field">
-              <label for="f-category">오류 유형 <span class="req">*</span></label>
-              <select id="f-category" required>
-                <option value="">선택하세요</option>
-                <option>로그인/계정</option>
-                <option>전자결재/공문</option>
-                <option>메일</option>
-                <option>팀사이트</option>
-                <option>모바일 앱</option>
-                <option>화면 표시 오류</option>
-                <option>기타</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="f-desc">증상 설명 <span class="req">*</span></label>
-            <textarea id="f-desc" required placeholder="언제, 어떤 화면에서, 어떤 오류가 발생했는지 적어주세요."></textarea>
-          </div>
-          <div class="field">
-            <label>화면 캡처 첨부 <span style="font-weight:500; color:var(--text-faint);">(선택, 1장)</span></label>
-            <label class="file-drop" id="file-drop-label">
-              <input type="file" id="f-image" accept="image/*">
-              <span id="file-drop-text">클릭하여 이미지 선택</span>
-            </label>
-            <div class="image-preview" id="image-preview" style="display:none;">
-              <img id="image-preview-img" alt="첨부 이미지 미리보기">
-              <button type="button" class="remove-img" id="remove-img" aria-label="이미지 제거">×</button>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary" id="support-submit" style="width:100%; justify-content:center; padding:12px 0; margin-top:6px;">접수하기</button>
-          <p class="form-note">접수된 내용은 이 페이지의 "접수 현황"에 저장되며, 담당자가 확인 후 처리합니다. 이메일·Teams 자동 알림 연동은 준비 중입니다.</p>
-        </form>
+        <p class="card-sub" style="color:var(--text);">접수 양식(Microsoft Forms)이 새 창으로 열립니다. 학교 메일 계정(@mail.ulsan.ac.kr)으로 로그인해 작성해 주세요. 화면 캡처 첨부도 양식에서 가능합니다.</p>
+        <a class="btn-primary" id="open-support-form" href="#" target="_blank" rel="noopener" style="width:100%; justify-content:center; padding:12px 0; margin-top:6px; text-decoration:none;">접수 양식 열기</a>
       </div>
 
       <div class="card">
-        <h3>접수 현황</h3>
-        <p class="card-sub">담당자 확인용 목록입니다. 상태를 바꾸고 처리 메모를 남길 수 있습니다.</p>
-        <div class="stat-row" id="ticket-stats"></div>
-        <div class="ticket-list" id="ticket-list"></div>
+        <h3>처리 안내</h3>
+        <p class="card-sub">접수 후에는 아래 순서로 진행됩니다.</p>
+        <ol class="form-note" style="margin:0; padding-left:18px; font-size:13px; color:var(--text);">
+          <li>접수하면 담당자(AI혁신원 AI혁신팀)에게 Teams 알림이 전달됩니다.</li>
+          <li>담당자가 확인 후 Teams 또는 메일로 처리 결과를 회신합니다.</li>
+          <li>접수 직후 응답 확인 메일은 양식에서 받으실 수 있습니다.</li>
+        </ol>
       </div>
     </div>
   </section>
@@ -750,44 +707,13 @@
 </footer>
 
 <div class="toast" id="toast"></div>
-<div class="lightbox" id="lightbox"><img id="lightbox-img" alt="첨부 이미지 확대보기"></div>
-
-<script id="app-state" type="application/json">{"tickets":[]}</script>
 
 <script>
 (function () {
   "use strict";
 
-  /* capture the served document verbatim, before any script mutates it,
-     so it can be regenerated later with fresh state and republished */
-  var ORIGINAL_DOC = "<!doctype html>\n" + document.documentElement.outerHTML;
-  var STATE_OPEN_TAG = '<script id="app-state" type="application/json">';
-
-  function buildDocWithState(state) {
-    var startIdx = ORIGINAL_DOC.indexOf(STATE_OPEN_TAG);
-    if (startIdx === -1) return null;
-    var contentStart = startIdx + STATE_OPEN_TAG.length;
-    var endIdx = ORIGINAL_DOC.indexOf("</scr" + "ipt>", contentStart);
-    if (endIdx === -1) return null;
-    var prefix = ORIGINAL_DOC.slice(0, contentStart);
-    var suffix = ORIGINAL_DOC.slice(endIdx);
-    /* escape '<' so a ticket description could never smuggle a literal
-       closing script tag into the regenerated document */
-    var safeJson = JSON.stringify(state).replace(/</g, "\\u003c");
-    return prefix + safeJson + suffix;
-  }
-
-  var state = { tickets: [] };
-  try {
-    var raw = document.getElementById("app-state").textContent;
-    var parsed = JSON.parse(raw);
-    if (parsed && Array.isArray(parsed.tickets)) state = parsed;
-  } catch (e) { /* keep default */ }
-
-  var artifactAPI = null;
-  if (window.claude && typeof window.claude.use === "function") {
-    window.claude.use("artifact").then(function (ns) { artifactAPI = ns; }).catch(function () { artifactAPI = null; });
-  }
+  /* 기술지원 접수 양식(Microsoft Forms) 주소. 접수는 Forms → Power Automate → Teams 알림으로 처리됨 */
+  var SUPPORT_FORM_URL = "__FORMS_URL__";
 
   /* ---------------- FAQ DATA ---------------- */
   var CATEGORIES = [
@@ -1071,8 +997,11 @@
       btn.textContent = "기술지원 접수하기 →";
       btn.addEventListener("click", function () {
         activateTab("support");
-        var descEl = document.getElementById("f-desc");
-        if (descEl) descEl.value = query;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(query).then(function () {
+            showToast("질문 내용을 복사했어요. 접수 양식의 증상 설명에 붙여넣어 주세요.");
+          }).catch(function () {});
+        }
       });
       bubble.querySelector(".msg-bubble").appendChild(btn);
       return;
@@ -1126,47 +1055,7 @@
     });
   })();
 
-  /* ---------------- Support form ---------------- */
-  var supportForm = document.getElementById("support-form");
-  var fImage = document.getElementById("f-image");
-  var fileDropLabel = document.getElementById("file-drop-label");
-  var fileDropText = document.getElementById("file-drop-text");
-  var imagePreview = document.getElementById("image-preview");
-  var imagePreviewImg = document.getElementById("image-preview-img");
-  var removeImgBtn = document.getElementById("remove-img");
-  var pendingImage = null;
-
-  fImage.addEventListener("change", function () {
-    var file = fImage.files && fImage.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var img = new Image();
-      img.onload = function () {
-        var maxW = 900;
-        var scale = Math.min(1, maxW / img.width);
-        var canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        pendingImage = canvas.toDataURL("image/jpeg", 0.75);
-        imagePreviewImg.src = pendingImage;
-        imagePreview.style.display = "inline-block";
-        fileDropText.textContent = file.name.length > 28 ? file.name.slice(0, 28) + "…" : file.name;
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-
-  removeImgBtn.addEventListener("click", function () {
-    pendingImage = null;
-    fImage.value = "";
-    imagePreview.style.display = "none";
-    fileDropText.textContent = "클릭하여 이미지 선택";
-  });
-
+  /* ---------------- Support (Microsoft Forms) ---------------- */
   function showToast(text) {
     var toast = document.getElementById("toast");
     toast.textContent = text;
@@ -1174,136 +1063,15 @@
     setTimeout(function () { toast.classList.remove("is-visible"); }, 3200);
   }
 
-  async function persistState() {
-    var html = buildDocWithState(state);
-    if (!html) { showToast("저장 형식 오류로 이 화면에서만 표시됩니다."); return false; }
-    if (!artifactAPI) { showToast("저장 기능을 사용할 수 없어 이 화면에서만 표시됩니다."); return false; }
-    try {
-      await artifactAPI.publish(html);
-      return true;
-    } catch (err) {
-      var code = err && err.code;
-      if (code === "conflict") return true; /* view is already reloading to the newer version */
-      showToast("저장에 실패했습니다. 이 화면에서만 임시로 표시됩니다.");
-      return false;
-    }
-  }
-
-  supportForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    var submitBtn = document.getElementById("support-submit");
-    var ticket = {
-      id: "T" + Date.now().toString(36).toUpperCase(),
-      createdAt: new Date().toISOString(),
-      name: document.getElementById("f-name").value.trim(),
-      dept: document.getElementById("f-dept").value.trim(),
-      contact: document.getElementById("f-contact").value.trim(),
-      category: document.getElementById("f-category").value,
-      description: document.getElementById("f-desc").value.trim(),
-      image: pendingImage,
-      status: "접수",
-      memo: ""
-    };
-    if (!ticket.name || !ticket.dept || !ticket.category || !ticket.description) return;
-
-    state.tickets = [ticket].concat(state.tickets);
-    renderTickets();
-
-    submitBtn.disabled = true; submitBtn.textContent = "접수 중...";
-    supportForm.reset();
-    removeImgBtn.click();
-    var ok = await persistState();
-    submitBtn.disabled = false; submitBtn.textContent = "접수하기";
-    showToast(ok ? "접수되었습니다. 확인 후 회신드리겠습니다." : "접수는 되었지만 저장에 문제가 있어요.");
-  });
-
-  /* ---------------- Ticket list / admin ---------------- */
-  var ticketListEl = document.getElementById("ticket-list");
-  var ticketStatsEl = document.getElementById("ticket-stats");
-  var STATUS_OPTIONS = ["접수", "처리중", "완료"];
-
-  function formatDate(iso) {
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return "";
-    var pad = function (n) { return String(n).padStart(2, "0"); };
-    return (d.getMonth() + 1) + "/" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
-  }
-
-  function renderTickets() {
-    var counts = { "접수": 0, "처리중": 0, "완료": 0 };
-    state.tickets.forEach(function (t) { counts[t.status] = (counts[t.status] || 0) + 1; });
-    ticketStatsEl.innerHTML =
-      statPill(state.tickets.length, "전체") +
-      statPill(counts["접수"], "접수") +
-      statPill(counts["처리중"], "처리중") +
-      statPill(counts["완료"], "완료");
-
-    if (state.tickets.length === 0) {
-      ticketListEl.innerHTML = '<div class="empty-state">아직 접수된 문의가 없습니다.</div>';
-      return;
-    }
-    ticketListEl.innerHTML = "";
-    state.tickets.forEach(function (t) {
-      var card = document.createElement("div");
-      card.className = "ticket-card";
-      card.innerHTML =
-        '<div class="ticket-head">' +
-          '<div><div class="ticket-who">' + escapeHtml(t.name) + ' <span>' + escapeHtml(t.dept) + '</span></div>' +
-          '<div class="ticket-id">' + t.id + ' · ' + formatDate(t.createdAt) + '</div></div>' +
-          '<span class="status-pill status-' + t.status + '">' + t.status + '</span>' +
-        '</div>' +
-        '<span class="ticket-cat">' + escapeHtml(t.category) + '</span>' +
-        '<div class="ticket-desc">' + escapeHtml(t.description) + '</div>' +
-        (t.image ? '<img class="ticket-img" src="' + t.image + '" alt="첨부 캡처">' : '') +
-        (t.contact ? '<div class="ticket-meta-time" style="margin-bottom:8px;">연락처: ' + escapeHtml(t.contact) + '</div>' : '') +
-        '<div class="ticket-controls">' +
-          '<select class="t-status"></select>' +
-          '<textarea class="t-memo" placeholder="처리 메모">' + escapeHtml(t.memo || "") + '</textarea>' +
-          '<button type="button" class="btn-secondary t-save">저장</button>' +
-        '</div>';
-
-      var select = card.querySelector(".t-status");
-      STATUS_OPTIONS.forEach(function (s) {
-        var opt = document.createElement("option");
-        opt.value = s; opt.textContent = s;
-        if (s === t.status) opt.selected = true;
-        select.appendChild(opt);
-      });
-
-      var img = card.querySelector(".ticket-img");
-      if (img) {
-        img.addEventListener("click", function () {
-          document.getElementById("lightbox-img").src = t.image;
-          document.getElementById("lightbox").classList.add("is-open");
-        });
-      }
-
-      card.querySelector(".t-save").addEventListener("click", async function () {
-        var btn = this;
-        var newStatus = select.value;
-        var newMemo = card.querySelector(".t-memo").value;
-        var idx = state.tickets.findIndex(function (x) { return x.id === t.id; });
-        if (idx === -1) return;
-        state.tickets[idx] = Object.assign({}, state.tickets[idx], { status: newStatus, memo: newMemo });
-        renderTickets();
-        btn.disabled = true; btn.textContent = "저장 중...";
-        var ok = await persistState();
-        showToast(ok ? "상태가 저장되었습니다." : "저장에 실패했습니다.");
-      });
-
-      ticketListEl.appendChild(card);
+  var openFormBtn = document.getElementById("open-support-form");
+  if (SUPPORT_FORM_URL.indexOf("http") === 0) {
+    openFormBtn.href = SUPPORT_FORM_URL;
+  } else {
+    openFormBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      showToast("접수 양식 주소가 아직 설정되지 않았습니다.");
     });
   }
-
-  function statPill(num, label) {
-    return '<div class="stat-pill"><div class="num">' + num + '</div><div class="lbl">' + label + '</div></div>';
-  }
-
-  renderTickets();
-
-  document.getElementById("lightbox").addEventListener("click", function () {
-    this.classList.remove("is-open");
-  });
 })();
 </script>
 </body>
