@@ -279,6 +279,9 @@
   .faq-answer p { margin: 0 0 10px; white-space: pre-line; }
   .faq-answer p:last-child { margin-bottom: 0; }
   .faq-answer strong { color: var(--text); }
+  .faq-answer a, .msg.from-bot .msg-bubble a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+  .faq-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .faq-links a { text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
   .faq-meta-line {
     margin-top: 12px;
     font-size: 11.5px;
@@ -616,6 +619,27 @@
     });
   }
 
+  /* 이미 escapeHtml을 거친 문장에서 주소를 링크로 바꾼다.
+     https:// 주소와 학교 주소(mgw.ulsan.ac.kr 등)만 대상이며, 메일 주소(아이디@mail.ulsan.ac.kr)는 건드리지 않는다 */
+  var LINK_RE = /(https?:\/\/[^\s<&]*[^\s<&.,)])|(^|[^@\w.\/-])((?:[a-z0-9-]+\.)+ulsan\.ac\.kr(?:\/[^\s<&]*[^\s<&.,)])?)(?![\w.-]*@)/gi;
+  function linkify(escaped) {
+    return escaped.replace(LINK_RE, function (m, url, pre, host) {
+      var text = url || host;
+      var href = url || "https://" + host;
+      return (pre || "") + '<a href="' + href + '" target="_blank" rel="noopener">' + text + '</a>';
+    });
+  }
+
+  /* faq.json의 links: [{ "label": "...", "url": "https://..." }] → 답변 아래 버튼 */
+  function linksHtml(item) {
+    var links = (item.links || []).filter(function (l) { return /^https?:\/\//.test(l.url); });
+    if (!links.length) return "";
+    return '<div class="faq-links">' + links.map(function (l) {
+      return '<a class="btn-secondary" href="' + escapeHtml(l.url) + '" target="_blank" rel="noopener">' +
+        escapeHtml(l.label) + ' ↗</a>';
+    }).join("") + '</div>';
+  }
+
   /* ---------------- tabs ---------------- */
   var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
   var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
@@ -701,7 +725,7 @@
       el.dataset.id = String(item.id);
       el.dataset.open = String(item.id === openId);
       var answerHtml = item.a.split("\n\n").map(function (para) {
-        return "<p>" + escapeHtml(para) + "</p>";
+        return "<p>" + linkify(escapeHtml(para)) + "</p>";
       }).join("");
       el.innerHTML =
         '<button class="faq-q" type="button" aria-expanded="' + (item.id === openId) + '" aria-controls="faq-a-' + item.id + '">' +
@@ -709,7 +733,7 @@
           '<span class="faq-q-text">' + escapeHtml(item.q) + '</span>' +
           '<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
         '</button>' +
-        '<div class="faq-answer" id="faq-a-' + item.id + '">' + answerHtml + '<div class="faq-meta-line">FAQ #' + item.id + '</div></div>';
+        '<div class="faq-answer" id="faq-a-' + item.id + '">' + answerHtml + linksHtml(item) + '<div class="faq-meta-line">FAQ #' + item.id + '</div></div>';
       var qBtn = el.querySelector(".faq-q");
       qBtn.addEventListener("click", function () {
         var isOpen = el.dataset.open === "true";
@@ -854,7 +878,7 @@
     }
     var top = decision.top;
     var firstPara = top.item.a.split("\n\n")[0];
-    var html = '<p><strong>' + escapeHtml(top.item.q) + '</strong></p><p>' + escapeHtml(firstPara) + '</p>';
+    var html = '<p><strong>' + escapeHtml(top.item.q) + '</strong></p><p>' + linkify(escapeHtml(firstPara)) + '</p>';
     var bubble = addMessage("bot", html);
     var srcBtn = document.createElement("button");
     srcBtn.className = "msg-source";
