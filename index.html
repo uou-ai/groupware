@@ -660,8 +660,6 @@
     renderFaqList();
   }
 
-  function normalize(s) { return (s || "").toLowerCase().replace(/\s+/g, ""); }
-
   function filterFaq() {
     var q = normalize(faqSearchInput.value);
     return FAQ_DATA.filter(function (item) {
@@ -723,26 +721,73 @@
   var chatInput = document.getElementById("chat-input");
   var chatSuggestionsEl = document.getElementById("chat-suggestions");
 
-  function scoreItem(item, query) {
-    var nq = normalize(query);
-    if (!nq) return 0;
-    var score = 0;
-    item.tags.forEach(function (tag) {
-      if (nq.indexOf(normalize(tag)) !== -1) score += 3;
+  /* ---------------- 답변 찾기 ----------------
+     <matcher> ~ </matcher> 구간은 scripts/test-chatbot.mjs가 그대로 읽어 시험한다.
+     이 구간에서는 화면(DOM)을 다루지 않는다. */
+  /* <matcher> */
+  function normalize(s) { return (s || "").toLowerCase().replace(/\s+/g, ""); }
+
+  /* 질문에 흔히 붙는 말. 두 글자 겹침 계산에서 빼야 '어떻게 하나요' 같은 말만으로 엉뚱한 답이 나오지 않는다 */
+  var FILLER_WORDS = ["안녕하세요", "어떻게", "어디", "무엇", "방법", "하나요", "있나요", "없나요", "되나요", "인가요",
+    "뭔가요", "하세요", "해요", "돼요", "싶어요", "알려줘", "알려주세요", "주세요", "좀", "수", "할", "있는"];
+
+  function bigrams(query) {
+    var words = query.split(/[\s?!.,·()"'~]+/).filter(function (w) {
+      return w && FILLER_WORDS.indexOf(w) === -1;
     });
-    var hay = normalize(item.q + " " + item.a);
-    var shingles = [];
-    for (var i = 0; i < nq.length - 1; i++) shingles.push(nq.slice(i, i + 2));
-    var hits = 0;
-    shingles.forEach(function (sh) { if (hay.indexOf(sh) !== -1) hits++; });
-    score += (shingles.length ? hits / shingles.length : 0) * 4;
-    return score;
+    var nq = normalize(words.join(""));
+    var grams = [];
+    for (var i = 0; i < nq.length - 1; i++) grams.push(nq.slice(i, i + 2));
+    return grams;
   }
 
-  function findAnswers(query) {
-    return FAQ_DATA.map(function (item) { return { item: item, score: scoreItem(item, query) }; })
-      .sort(function (a, b) { return b.score - a.score; });
+  function overlap(grams, text) {
+    if (!grams.length) return 0;
+    var hits = 0;
+    grams.forEach(function (g) { if (text.indexOf(g) !== -1) hits++; });
+    return hits / grams.length;
   }
+
+  /* 점수 = 태그 일치 수 × 3 + 질문 문장 겹침 비율 × 4 + 질문·답변 전체 겹침 비율 × 4 */
+  function scoreItem(item, query) {
+    var nq = normalize(query);
+    if (!nq) return { score: 0, tagHits: 0, ratio: 0 };
+    var tagHits = 0;
+    item.tags.forEach(function (tag) {
+      if (nq.indexOf(normalize(tag)) !== -1) tagHits++;
+    });
+    var grams = bigrams(query);
+    var ratioQ = overlap(grams, normalize(item.q));
+    var ratio = overlap(grams, normalize(item.q + " " + item.a));
+    return { score: tagHits * 3 + ratioQ * 4 + ratio * 4, tagHits: tagHits, ratio: ratio };
+  }
+
+  function rankFaq(items, query) {
+    return items.map(function (item) {
+      var s = scoreItem(item, query);
+      return { item: item, score: s.score, tagHits: s.tagHits, ratio: s.ratio };
+    }).sort(function (a, b) { return b.score - a.score; });
+  }
+
+  /* 태그가 하나도 맞지 않으면 두 글자 겹침이 60% 이상일 때만 관련 있다고 본다(예: 'VPN 접속 방법'이 FAQ #1로 가지 않게) */
+  function isRelevant(r) {
+    return r.score >= 1.4 && (r.tagHits > 0 || r.ratio >= 0.6);
+  }
+
+  /* 순위 결과로 답할 방식을 정한다.
+     none: 답 없음(기술지원 안내) / choices: 점수가 비슷한 후보 여럿 / answer: 1위 답변 + 관련 항목 */
+  function decideAnswer(ranked) {
+    var top = ranked[0];
+    if (!top || !isRelevant(top)) return { type: "none" };
+    var close = ranked.slice(1, 3).filter(function (r) { return r.score >= top.score * 0.9; });
+    if (close.length) return { type: "choices", choices: [top].concat(close) };
+    return {
+      type: "answer",
+      top: top,
+      related: ranked.slice(1, 3).filter(isRelevant)
+    };
+  }
+  /* </matcher> */
 
   function addMessage(role, html) {
     var msg = document.createElement("div");
@@ -757,9 +802,8 @@
   }
 
   function botAnswer(query) {
-    var ranked = findAnswers(query);
-    var top = ranked[0];
-    if (!top || top.score < 1.4) {
+    var decision = decideAnswer(rankFaq(FAQ_DATA, query));
+    if (decision.type === "none") {
       var html =
         '<p>정확히 일치하는 답변을 찾지 못했어요. 표현을 조금 바꿔서 다시 물어보시거나, 아래에서 기술지원으로 바로 접수하실 수 있어요.</p>';
       var bubble = addMessage("bot", html);
@@ -777,6 +821,19 @@
       bubble.querySelector(".msg-bubble").appendChild(btn);
       return;
     }
+    if (decision.type === "choices") {
+      var pick = addMessage("bot", "<p>질문과 비슷한 FAQ가 여러 개 있어요. 찾으시는 내용을 골라 주세요.</p>");
+      decision.choices.forEach(function (c) {
+        var choiceBtn = document.createElement("button");
+        choiceBtn.className = "msg-source"; choiceBtn.type = "button";
+        choiceBtn.style.display = "flex"; choiceBtn.style.textAlign = "left";
+        choiceBtn.textContent = "FAQ #" + c.item.id + " · " + c.item.q;
+        choiceBtn.addEventListener("click", function () { openFaqInList(c.item.id); });
+        pick.querySelector(".msg-bubble").appendChild(choiceBtn);
+      });
+      return;
+    }
+    var top = decision.top;
     var firstPara = top.item.a.split("\n\n")[0];
     var html = '<p><strong>' + escapeHtml(top.item.q) + '</strong></p><p>' + escapeHtml(firstPara) + '</p>';
     var bubble = addMessage("bot", html);
@@ -786,7 +843,7 @@
     srcBtn.addEventListener("click", function () { openFaqInList(top.item.id); });
     bubble.querySelector(".msg-bubble").appendChild(srcBtn);
 
-    var related = ranked.slice(1, 3).filter(function (r) { return r.score > 0.9; });
+    var related = decision.related;
     if (related.length) {
       var follow = document.createElement("div");
       follow.className = "msg-follow";
