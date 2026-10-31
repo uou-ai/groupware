@@ -348,6 +348,7 @@
   }
   .msg-source:hover { background: var(--accent-soft-border); }
   .msg-follow { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .msg.from-bot .msg-bubble .faq-links a { color: var(--text); text-decoration: none; background: var(--surface); }
 
   .chat-suggestions {
     padding: 0 20px 16px;
@@ -612,6 +613,7 @@
   var CAT_LABEL = {};
   var FAQ_DATA = [];
   var SUGGESTED_QUESTIONS = [];
+  var SYNONYMS = {};
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (c) {
@@ -771,63 +773,168 @@
   function normalize(s) { return (s || "").toLowerCase().replace(/\s+/g, ""); }
 
   /* 질문에 흔히 붙는 말. 두 글자 겹침 계산에서 빼야 '어떻게 하나요' 같은 말만으로 엉뚱한 답이 나오지 않는다 */
-  var FILLER_WORDS = ["안녕하세요", "어떻게", "어디", "무엇", "방법", "하나요", "있나요", "없나요", "되나요", "인가요",
-    "뭔가요", "하세요", "해요", "돼요", "싶어요", "알려줘", "알려주세요", "주세요", "좀", "수", "할", "있는"];
+  var FILLER_WORDS = ["안녕하세요", "어떻게", "어디", "어디서", "어디에", "무엇", "뭐", "왜", "방법", "방법은", "법",
+    "하나요", "있나요", "없나요", "되나요", "인가요", "뭔가요", "하세요", "해요", "돼요", "되요", "됩니다", "합니다",
+    "싶어요", "싶습니다", "알려줘", "알려주세요", "주세요", "궁금해요", "궁금합니다", "가능한가요", "가능할까요",
+    "있을까요", "할까요", "좀", "수", "할", "있는", "안", "못", "안돼요", "안되요", "안됩니다", "없어요", "없습니다",
+    "자꾸", "계속", "혹시", "제가", "저는", "그냥", "이거", "그거"];
 
-  function bigrams(query) {
-    var words = query.split(/[\s?!.,·()"'~]+/).filter(function (w) {
-      return w && FILLER_WORDS.indexOf(w) === -1;
+  /* 낱말 끝에 붙는 조사·어미(긴 것부터 확인). 떼고 비교해야 '팝업이', '설치해요'가 '팝업', '설치'와 같게 취급된다 */
+  var ENDINGS = ["하려면", "했는데", "했어요", "하는데", "해주세요", "합니다", "하나요", "하는", "해요", "해서", "해야",
+    "하기", "되나요", "됩니다", "돼요", "되요", "에서는", "에서", "에게", "으로", "까지", "부터",
+    "은", "는", "이", "가", "을", "를", "에", "의", "도", "로", "와", "과", "만"];
+
+  function stripEnding(w) {
+    for (var i = 0; i < ENDINGS.length; i++) {
+      var e = ENDINGS[i];
+      if (w.length - e.length >= 2 && w.slice(-e.length) === e) return w.slice(0, -e.length);
+    }
+    return w;
+  }
+
+  /* faq.json의 synonyms: { "설치": ["깔고", "까는"] } → 질문에 '깔고'가 있으면 '설치'도 있는 것으로 본다 */
+  function expandSynonyms(query, synonyms) {
+    var nq = normalize(query), extra = [];
+    Object.keys(synonyms || {}).forEach(function (word) {
+      if (nq.indexOf(normalize(word)) !== -1) return;
+      var hit = synonyms[word].some(function (v) { return nq.indexOf(normalize(v)) !== -1; });
+      if (hit) extra.push(word);
     });
-    var nq = normalize(words.join(""));
+    return extra.length ? query + " " + extra.join(" ") : query;
+  }
+
+  /* 어미 조각('켜져요'의 '져요', '됩니다'의 '니다')은 어느 문장에나 있어 비교에서 뺀다 */
+  function isEndingGram(g) {
+    return g.charAt(1) === "요" || ["니다", "습니", "합니", "됩니", "해서", "하는", "하고", "는데", "었는", "았는"].indexOf(g) !== -1;
+  }
+
+  /* 질문을 낱말로 나눠 흔한 말·조사를 뺀 뒤, 낱말 안에서만 두 글자씩 자른다(낱말 경계를 넘는 조각은 우연히 겹치기 쉬움) */
+  function bigrams(query) {
     var grams = [];
-    for (var i = 0; i < nq.length - 1; i++) grams.push(nq.slice(i, i + 2));
+    query.toLowerCase().split(/[\s?!.,·()"'~]+/).forEach(function (w) {
+      if (!w || FILLER_WORDS.indexOf(w) !== -1) return;
+      w = stripEnding(w);
+      if (FILLER_WORDS.indexOf(w) !== -1) return;
+      for (var i = 0; i < w.length - 1; i++) {
+        var g = w.slice(i, i + 2);
+        if (!isEndingGram(g) && grams.indexOf(g) === -1) grams.push(g);
+      }
+    });
     return grams;
   }
 
-  function overlap(grams, text) {
-    if (!grams.length) return 0;
-    var hits = 0;
-    grams.forEach(function (g) { if (text.indexOf(g) !== -1) hits++; });
-    return hits / grams.length;
+  /* 낱말의 무게: 적은 FAQ에만 나오는 말일수록 1에 가깝고, 거의 모든 FAQ에 나오는 말('그룹웨어', '메일')은 0.2~0.4 정도.
+     FAQ가 늘어나도 따로 손볼 필요 없이 자동으로 다시 계산된다 */
+  var stats = { items: null };
+  function corpus(items) {
+    if (stats.items !== items) {
+      stats = {
+        items: items,
+        texts: items.map(function (it) { return normalize(it.q + " " + it.a + " " + it.tags.join(" ")); }),
+        df: {}
+      };
+    }
+    return stats;
+  }
+  function weight(c, term) {
+    if (!(term in c.df)) c.df[term] = c.texts.filter(function (t) { return t.indexOf(term) !== -1; }).length;
+    var n = c.texts.length, df = c.df[term];
+    return df ? Math.log(1 + n / df) / Math.log(1 + n) : 1;
   }
 
-  /* 점수 = 태그 일치 수 × 3 + 질문 문장 겹침 비율 × 4 + 질문·답변 전체 겹침 비율 × 4 */
-  function scoreItem(item, query) {
-    var nq = normalize(query);
-    if (!nq) return { score: 0, tagHits: 0, ratio: 0 };
-    var tagHits = 0;
-    item.tags.forEach(function (tag) {
-      if (nq.indexOf(normalize(tag)) !== -1) tagHits++;
+  /* 질문 조각 중 text에 들어 있는 비율(무게 반영)과, 들어 있는 조각의 무게 합 */
+  function overlap(c, grams, text) {
+    var hit = 0, total = 0;
+    grams.forEach(function (g) {
+      var w = weight(c, g);
+      total += w;
+      if (text.indexOf(g) !== -1) hit += w;
     });
-    var grams = bigrams(query);
-    var ratioQ = overlap(grams, normalize(item.q));
-    var ratio = overlap(grams, normalize(item.q + " " + item.a));
-    return { score: tagHits * 3 + ratioQ * 4 + ratio * 4, tagHits: tagHits, ratio: ratio };
+    return { ratio: total ? hit / total : 0, hit: hit };
   }
 
-  function rankFaq(items, query) {
-    return items.map(function (item) {
-      var s = scoreItem(item, query);
-      return { item: item, score: s.score, tagHits: s.tagHits, ratio: s.ratio };
+  /* 질문에 들어 있는 태그. 더 긴 태그 안에 들어 있는 짧은 태그는 뺀다
+     (예: '부서수신함'을 물었을 때 '부서', '수신' 태그가 따로 점수를 받지 않게) */
+  function matchedTags(items, nq) {
+    var found = [];
+    items.forEach(function (it) {
+      it.tags.forEach(function (t) {
+        t = normalize(t);
+        if (t && found.indexOf(t) === -1 && nq.indexOf(t) !== -1) found.push(t);
+      });
+    });
+    found.sort(function (a, b) { return b.length - a.length; });
+    var covered = [], alive = {};
+    found.forEach(function (t) {
+      var free = false;
+      for (var at = nq.indexOf(t); at !== -1; at = nq.indexOf(t, at + 1)) {
+        for (var i = at; i < at + t.length; i++) if (!covered[i]) free = true;
+        for (i = at; i < at + t.length; i++) covered[i] = true;
+      }
+      if (free) alive[t] = true;
+    });
+    return alive;
+  }
+
+  /* 점수 = Σ(태그 무게 × 3) + 질문 문장 겹침 비율 × 4 + 질문·답변 전체 겹침 비율 × 4 */
+  function rankFaq(items, query, synonyms) {
+    var c = corpus(items);
+    query = expandSynonyms(query, synonyms);
+    var nq = normalize(query);
+    var alive = nq ? matchedTags(items, nq) : {};
+    var grams = bigrams(query);
+    return items.map(function (item, idx) {
+      var tagScore = 0, tagHits = 0, seen = {};
+      item.tags.forEach(function (t) {
+        t = normalize(t);
+        if (alive[t] && !seen[t]) { seen[t] = true; tagHits++; tagScore += 3 * weight(c, t); }
+      });
+      var ratioQ = overlap(c, grams, normalize(item.q)).ratio;
+      var all = overlap(c, grams, c.texts[idx]);
+      return {
+        item: item, score: tagScore + ratioQ * 4 + all.ratio * 4,
+        tagScore: tagScore, tagHits: tagHits, ratioQ: ratioQ, ratio: all.ratio, hit: all.hit
+      };
     }).sort(function (a, b) { return b.score - a.score; });
   }
 
-  /* 태그가 하나도 맞지 않으면 두 글자 겹침이 60% 이상일 때만 관련 있다고 본다(예: 'VPN 접속 방법'이 FAQ #1로 가지 않게) */
+  /* 관련 있다고 볼 조건(하나라도 맞으면 됨)
+     - 흔하지 않은 태그가 맞음(흔한 태그 '메일' 하나만으로는 부족)
+     - 두 글자 겹침이 60% 이상이면서 FAQ 질문 문장과도 겹침(답변 속 지나가는 말에만 걸린 경우 제외)
+     - 질문의 말이 거의 모두 답변에 들어 있음(예: '일괄결재 하는 법' → 사용자 매뉴얼 FAQ의 목차) */
   function isRelevant(r) {
-    return r.score >= 1.4 && (r.tagHits > 0 || r.ratio >= 0.6);
+    return r.score >= 2.5 &&
+      (r.tagScore >= 1.8 || (r.ratio >= 0.6 && r.ratioQ >= 0.25) || (r.ratio >= 0.95 && r.hit >= 1.5));
+  }
+  /* 확실하지는 않지만 후보로 보여 줄 만한 정도 */
+  function isPossible(r) {
+    return r.score >= 2 && (r.tagScore >= 1 || (r.ratio >= 0.45 && r.ratioQ > 0) || (r.ratio >= 0.95 && r.hit >= 1));
   }
 
-  /* 순위 결과로 답할 방식을 정한다.
-     none: 답 없음(기술지원 안내) / choices: 점수가 비슷한 후보 여럿 / answer: 1위 답변 + 관련 항목 */
-  function decideAnswer(ranked) {
+  /* 인사·감사 인사만 있는 말 */
+  var SMALL_TALK = /^(안녕(하세요|하십니까)?|반갑습니다|하이|hi|hello|감사(합니다|해요)?|고마워요|고맙습니다|ㄱㅅ|ㅎㅇ|수고하세요)+$/;
+  function isSmallTalk(query) {
+    return SMALL_TALK.test(normalize(query).replace(/[?!.,~^ㅎㅋ]+$/g, "").replace(/[?!.,~]/g, ""));
+  }
+
+  /* 질문에 답할 방식을 정한다.
+     smalltalk: 인사 / none: 답 없음(기술지원 안내) / maybe: 확실하지 않은 후보 + 기술지원 안내
+     choices: 점수가 비슷한 후보 여럿 / answer: 1위 답변 + 관련 항목 */
+  function findAnswer(items, query, synonyms) {
+    if (isSmallTalk(query)) return { type: "smalltalk", ranked: [] };
+    var ranked = rankFaq(items, query, synonyms);
     var top = ranked[0];
-    if (!top || !isRelevant(top)) return { type: "none" };
-    var close = ranked.slice(1, 3).filter(function (r) { return r.score >= top.score * 0.9; });
-    if (close.length) return { type: "choices", choices: [top].concat(close) };
+    if (!top || !isRelevant(top)) {
+      var maybe = ranked.slice(0, 3).filter(isPossible);
+      return maybe.length ? { type: "maybe", choices: maybe, ranked: ranked } : { type: "none", ranked: ranked };
+    }
+    var close = ranked.slice(1, 3).filter(function (r) { return r.score >= top.score * 0.9 && isRelevant(r); });
+    if (close.length) return { type: "choices", choices: [top].concat(close), ranked: ranked };
     return {
       type: "answer",
       top: top,
-      related: ranked.slice(1, 3).filter(isRelevant)
+      related: ranked.slice(1, 3).filter(isRelevant),
+      ranked: ranked
     };
   }
   /* </matcher> */
@@ -844,62 +951,94 @@
     return msg;
   }
 
-  function botAnswer(query) {
-    var decision = decideAnswer(rankFaq(FAQ_DATA, query));
-    if (decision.type === "none") {
-      var html =
-        '<p>정확히 일치하는 답변을 찾지 못했어요. 표현을 조금 바꿔서 다시 물어보시거나, 아래에서 기술지원으로 바로 접수하실 수 있어요.</p>';
-      var bubble = addMessage("bot", html);
-      var btn = document.createElement("button");
-      btn.className = "msg-source"; btn.style.marginTop = "10px";
-      btn.textContent = "기술지원 접수하기 →";
-      btn.addEventListener("click", function () {
-        activateTab("support");
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(query).then(function () {
-            showToast("질문 내용을 복사했어요. 접수 양식의 증상 설명에 붙여넣어 주세요.");
-          }).catch(function () {});
-        }
-      });
-      bubble.querySelector(".msg-bubble").appendChild(btn);
-      return;
-    }
-    if (decision.type === "choices") {
-      var pick = addMessage("bot", "<p>질문과 비슷한 FAQ가 여러 개 있어요. 찾으시는 내용을 골라 주세요.</p>");
-      decision.choices.forEach(function (c) {
-        var choiceBtn = document.createElement("button");
-        choiceBtn.className = "msg-source"; choiceBtn.type = "button";
-        choiceBtn.style.display = "flex"; choiceBtn.style.textAlign = "left";
-        choiceBtn.textContent = "FAQ #" + c.item.id + " · " + c.item.q;
-        choiceBtn.addEventListener("click", function () { openFaqInList(c.item.id); });
-        pick.querySelector(".msg-bubble").appendChild(choiceBtn);
-      });
-      return;
-    }
-    var top = decision.top;
-    var firstPara = top.item.a.split("\n\n")[0];
-    var html = '<p><strong>' + escapeHtml(top.item.q) + '</strong></p><p>' + linkify(escapeHtml(firstPara)) + '</p>';
-    var bubble = addMessage("bot", html);
-    var srcBtn = document.createElement("button");
-    srcBtn.className = "msg-source";
-    srcBtn.textContent = "FAQ #" + top.item.id + " 전체 보기";
-    srcBtn.addEventListener("click", function () { openFaqInList(top.item.id); });
-    bubble.querySelector(".msg-bubble").appendChild(srcBtn);
+  /* 챗봇 답변: FAQ 답변 전체와 참고 자료 버튼을 말풍선에 그대로 보여 준다 */
+  function answerHtml(item) {
+    return '<p><strong>' + escapeHtml(item.q) + '</strong></p>' +
+      item.a.split("\n\n").map(function (para) { return "<p>" + linkify(escapeHtml(para)) + "</p>"; }).join("") +
+      linksHtml(item);
+  }
 
-    var related = decision.related;
+  function addButton(bubble, className, text, onClick) {
+    var btn = document.createElement("button");
+    btn.className = className; btn.type = "button"; btn.textContent = text;
+    btn.addEventListener("click", onClick);
+    bubble.querySelector(".msg-bubble").appendChild(btn);
+    return btn;
+  }
+
+  function addSupportButton(bubble, query) {
+    addButton(bubble, "msg-source", "기술지원 접수하기 →", function () {
+      activateTab("support");
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(query).then(function () {
+          showToast("질문 내용을 복사했어요. 접수 양식의 증상 설명에 붙여넣어 주세요.");
+        }).catch(function () {});
+      }
+    }).style.marginTop = "10px";
+  }
+
+  /* 후보 FAQ 목록. 누르면 그 답변을 챗봇 말풍선으로 보여 준다 */
+  function addChoiceButtons(bubble, choices) {
+    choices.forEach(function (c) {
+      var btn = addButton(bubble, "msg-source", "FAQ #" + c.item.id + " · " + c.item.q, function () {
+        addMessage("user", "<p>" + escapeHtml(c.item.q) + "</p>");
+        showAnswer(c.item, []);
+      });
+      btn.style.display = "flex"; btn.style.textAlign = "left";
+    });
+  }
+
+  function showAnswer(item, related) {
+    var bubble = addMessage("bot", answerHtml(item));
+    addButton(bubble, "msg-source", "FAQ #" + item.id + " 목록에서 보기", function () { openFaqInList(item.id); });
     if (related.length) {
       var follow = document.createElement("div");
       follow.className = "msg-follow";
       related.forEach(function (r) {
         var chip = document.createElement("button");
-        chip.className = "suggestion-chip";
+        chip.className = "suggestion-chip"; chip.type = "button";
         chip.style.padding = "6px 11px"; chip.style.fontSize = "11.5px";
         chip.textContent = r.item.q.length > 24 ? r.item.q.slice(0, 24) + "…" : r.item.q;
-        chip.addEventListener("click", function () { openFaqInList(r.item.id); });
+        chip.title = r.item.q;
+        chip.addEventListener("click", function () {
+          addMessage("user", "<p>" + escapeHtml(r.item.q) + "</p>");
+          showAnswer(r.item, []);
+        });
         follow.appendChild(chip);
       });
       bubble.querySelector(".msg-bubble").appendChild(follow);
     }
+    /* 긴 답변은 말풍선 첫 줄이 보이도록 맞춘다 */
+    chatMessagesEl.scrollTop = bubble.offsetTop - chatMessagesEl.offsetTop - 12;
+  }
+
+  function botAnswer(query) {
+    var decision = findAnswer(FAQ_DATA, query, SYNONYMS);
+    if (decision.type === "smalltalk") {
+      addMessage("bot", /감사|고마|ㄱㅅ|수고/.test(query) ?
+        "<p>도움이 되었다면 다행이에요. 더 궁금한 점이 있으면 언제든 물어보세요.</p>" :
+        "<p>안녕하세요! 그룹웨어 사용 중 궁금한 점을 문장으로 적어 주시면 FAQ에서 찾아 드릴게요. (예: 팀사이트 가입이 안 돼요)</p>");
+      return;
+    }
+    if (decision.type === "none") {
+      var none = addMessage("bot",
+        '<p>정확히 일치하는 답변을 찾지 못했어요. 표현을 조금 바꿔서 다시 물어보시거나, 아래에서 기술지원으로 바로 접수하실 수 있어요.</p>');
+      addSupportButton(none, query);
+      return;
+    }
+    if (decision.type === "maybe") {
+      var maybe = addMessage("bot",
+        "<p>딱 맞는 답변은 찾지 못했어요. 혹시 아래 내용 중에 있을까요? 아니라면 기술지원으로 접수해 주세요.</p>");
+      addChoiceButtons(maybe, decision.choices);
+      addSupportButton(maybe, query);
+      return;
+    }
+    if (decision.type === "choices") {
+      var pick = addMessage("bot", "<p>질문과 비슷한 FAQ가 여러 개 있어요. 찾으시는 내용을 골라 주세요.</p>");
+      addChoiceButtons(pick, decision.choices);
+      return;
+    }
+    showAnswer(decision.top.item, decision.related);
   }
 
   function sendQuery(text) {
@@ -950,6 +1089,7 @@
     CATEGORIES = json.categories;
     CATEGORIES.forEach(function (c) { CAT_LABEL[c.id] = c.label; });
     SUGGESTED_QUESTIONS = json.suggestedQuestions || [];
+    SYNONYMS = json.synonyms || {};
     /* 답변(a)은 줄 단위 배열로 저장한다. 빈 문자열("")이 문단 구분 */
     FAQ_DATA = json.faqs.map(function (f) {
       var item = Object.assign({}, f);
